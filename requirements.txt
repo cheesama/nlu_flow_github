@@ -1,7 +1,10 @@
 scikit-learn
 tqdm
 fuzzyset
-soynlp
+
+#spell_corrector
+symspellpy
 
 #setting default dictionary 
+git+https://github.com/cheesama/soynlp
 
