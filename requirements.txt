@@ -6,5 +6,5 @@ fuzzyset
 symspellpy
 
 #setting default dictionary 
-git+https://github.com/cheesama/soynlp
+git+http://github.com/cheesama/soynlp
 
