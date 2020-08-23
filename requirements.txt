@@ -1,6 +1,7 @@
 scikit-learn
 tqdm
 fuzzyset
+texthero
 
 #spell_corrector
 symspellpy
