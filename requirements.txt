@@ -2,6 +2,8 @@ scikit-learn
 tqdm
 fuzzyset
 texthero
+pandas
+dill
 
 #spell_corrector
 symspellpy
