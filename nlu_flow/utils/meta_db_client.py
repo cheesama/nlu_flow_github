@@ -1,4 +1,5 @@
 ## use https://strapi.io/ to manage meta DB or dataset
+from tqdm import tqdm
 
 import requests
 import json
@@ -47,6 +48,9 @@ def get(url: str):
     cnt = request_to_server('get', '{}/count'.format(url))
     if not validate_api_output(cnt):
         raise ConnectionError("Strapi api failed")
+    if cnt == 'Not Found':
+        raise ConnectionError("Strapi api failed")
+
     res = []
     start, iter_num = 0, 200
     len_ = 0

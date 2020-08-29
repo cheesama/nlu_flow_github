@@ -42,7 +42,7 @@ class PosTagger:
         self.vocab = {}
         for k,v in self.pos_dict.items():
             for each_v in v:
-            self.vocab[(each_v, k)] = len(self.vocab)
+                self.vocab[(each_v, k)] = len(self.vocab)
 
     def tag(self, sentence):
         return self.tagger.tag(sentence)
@@ -68,7 +68,7 @@ class PosTagger:
         self.vocab = {}
         for k,v in self.pos_dict.items():
             for each_v in v:
-            self.vocab[(each_v, k)] = len(self.vocab)
+                self.vocab[(each_v, k)] = len(self.vocab)
 
     def get_vocab(self):
         return self.vocab
