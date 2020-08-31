@@ -13,7 +13,8 @@ endpoint = os.getenv('META_ENDPOINT')
 def request_to_server(
         method: str = "get", url: str = None, data: dict = None, headers: dict = None,
 ):
-    assert method in ["get", "post", "patch", "delete"]
+    assert method in ["get", "post", "put", "patch", "delete"]
+    assert endpoint is not None
 
     data = json.loads(json.dumps(data))
 

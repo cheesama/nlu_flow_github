@@ -1,0 +1,6 @@
+dill
+scikit-learn
+tqdm
+fastapi
+uvicorn
+requests

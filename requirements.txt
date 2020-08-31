@@ -3,6 +3,8 @@ tqdm
 fuzzyset
 pandas
 dill
+uvicorn
+fastapi
 
 #spell_corrector
 symspellpy

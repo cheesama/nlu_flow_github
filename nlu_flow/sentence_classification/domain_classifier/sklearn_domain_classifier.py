@@ -63,3 +63,5 @@ def train_domain_classifier():
     with open('domain_classifier_model.svc','wb') as f:
         dill.dump(svc, f)
         print ('domain_classifier model saved : domain_classifier_model.svc')
+
+train_domain_classifier()
