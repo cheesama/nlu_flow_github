@@ -5,6 +5,7 @@ pandas
 dill
 uvicorn
 fastapi
+numpy
 
 #spell_corrector
 symspellpy
