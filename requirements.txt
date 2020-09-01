@@ -1,4 +1,5 @@
 numpy
+psutil
 tqdm
 fuzzyset
 pandas
