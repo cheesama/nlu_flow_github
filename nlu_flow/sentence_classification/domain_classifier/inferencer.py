@@ -23,7 +23,7 @@ async def health():
         output = {'code': 500}
     return output
 
-@app.post("/predict")
+@app.post("/domain_classifier/predict")
 async def predict_domain(text: str):
     name = model.predict([text])[0]
     confidence = model.predict_proba([text])[0].max()
