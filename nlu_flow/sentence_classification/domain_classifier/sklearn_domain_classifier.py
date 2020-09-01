@@ -64,6 +64,9 @@ def train_domain_classifier():
     y_pred = svc.predict(X_test)
     print(classification_report(y_test, y_pred))
 
+    with open('report.md', 'w') as reportFile:
+        print(classification_report(y_test, y_pred), file=reportFile)
+
     #save domain classifier model
     with open('domain_classifier_model.svc','wb') as f:
         dill.dump(svc, f)
