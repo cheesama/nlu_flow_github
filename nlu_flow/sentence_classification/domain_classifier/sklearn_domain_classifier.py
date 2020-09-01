@@ -33,9 +33,14 @@ def train_domain_classifier():
     for scenario_table in scenario_table_list:
         scenario_data = meta_db_client.get(scenario_table)
         for data in tqdm(scenario_data, desc=f'collecting table data : {scenario_table}'):
-            utterances.append(preprocess(data['utterance']))
-            labels.append('scenario')
-
+            if 'data_type' in data.keys():
+                if data['data_type'] == 'training' and data['intent_id']['Intent_ID'] not in ['intent_미지원', 'intent_OOD']:
+                    utterances.append(preprocess(data['utterance']))
+                    labels.append('scenario')
+            else:
+                utterances.append(preprocess(data['utterance']))
+                labels.append('scenario')
+ 
     ## FAQ domain
     for faq_table in faq_table_list:
         faq_data = meta_db_client.get(faq_table)

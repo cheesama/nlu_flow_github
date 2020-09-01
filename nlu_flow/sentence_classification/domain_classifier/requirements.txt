@@ -1,6 +1,6 @@
 dill
-scikit-learn
 tqdm
 fastapi
 uvicorn
 requests
+scikit-learn==0.23.2
