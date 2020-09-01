@@ -15,7 +15,7 @@ jobs:
             apt-get install python3-dev
             pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements_model.txt
             python setup.py install
-            cd nlu_flow/sentence_classification/domain_classifier && pip install -r requirements.txt && python sklearn_domain_classifier.py
+            cd nlu_flow/sentence_classification/domain_classifier && pip install -r requirements.txt && python sklearn_domain_classifier.py && cp * ../../../
             # Write your CML report
             cml-send-comment report.md
       - name: Push Docker image to GitHub Packages
@@ -24,7 +24,7 @@ jobs:
             username: ${{ github.actor }}
             password: ${{ secrets.GITHUB_TOKEN }}
             registry: docker.pkg.github.com
-            repository: cheesama/nlu_flow/nlu_flow/sentence_classification/domain_classifier
+            repository: nlu_flow/sentence_classification/domain_classifier
             tag_with_ref: true
             # docker login https://docker.pkg.github.com -u USERNAME --password-stdin
             
