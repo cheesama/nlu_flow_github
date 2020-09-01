@@ -1,5 +1,5 @@
-# nlflow
-Natural Language Flow for business-chatbot
+# nlu_flow
+NLU model workFlow for business-chatbot
 
 ## Module Architecture
 

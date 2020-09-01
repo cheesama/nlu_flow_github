@@ -39,15 +39,38 @@ class PosTagger:
         self.postprocessor = UnknowLRPostprocessor()
         self.tagger = SimpleTagger(self.generator, self.evaluator, self.postprocessor)
 
+        self.vocab = {}
+        for k,v in self.pos_dict.items():
+            for each_v in v:
+                self.vocab[(each_v, k)] = len(self.vocab)
+
     def tag(self, sentence):
         return self.tagger.tag(sentence)
+
+    def tokenize(self, sentence):
+        tag_result = self.tag(sentence)
+        return [tag_info[0] for tag_info in tag_result]
 
     def extract_noun(self, sentences:list):
         pass
 
     def add_words(self, tag:str, words:list):
-        pass
+        if tag not in self.pos_dict.keys():
+            assert ValueError(f'tag should be in {self.pos_dict.keys()}')
+        
+        for word in words:
+            self.pos_dict[tag].add(word)
+        
+        self.dictionary = Dictionary(self.pos_dict)
+        self.generator = LRTemplateMatcher(self.dictionary)    
+        self.tagger = SimpleTagger(self.generator, self.evaluator, self.postprocessor)
+
+        self.vocab = {}
+        for k,v in self.pos_dict.items():
+            for each_v in v:
+                self.vocab[(each_v, k)] = len(self.vocab)
 
     def get_vocab(self):
-        pass
+        return self.vocab
+
 

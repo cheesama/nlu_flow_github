@@ -1,0 +1,5 @@
+#spell_corrector
+symspellpy
+
+#setting default dictionary
+git+http://github.com/cheesama/soynlp

@@ -1,10 +1,8 @@
-scikit-learn
+numpy
+psutil
 tqdm
 fuzzyset
-
-#spell_corrector
-symspellpy
-
-#setting default dictionary 
-git+https://github.com/cheesama/soynlp
+pandas
+dill
+scikit-learn==0.23.2
 

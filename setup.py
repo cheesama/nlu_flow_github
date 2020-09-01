@@ -4,11 +4,11 @@ with open("requirements.txt") as f:
     required = f.read().splitlines()
 
 setup(
-    name="nlflow",
+    name="nlu_flow",
     version="0.0.1",
     description="Natural Language Flow",
     author="Cheesama",
-    install_requires=required,
+    install_requires=[],
     packages=find_packages(exclude=["docs", "tests", "tmp", "data"]),
     python_requires=">=3",
     zip_safe=False,
