@@ -54,7 +54,7 @@ def get(url: str):
         raise ConnectionError("Strapi api failed")
 
     res = []
-    start, iter_num = 0, 10
+    start, iter_num = 0, 50
     len_ = 0
     while len_ < int(cnt):
         tmp_ids = request_to_server('get', url='{}?_start={}&_limit={}'.format(url, start, iter_num))
