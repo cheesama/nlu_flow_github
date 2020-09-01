@@ -3,13 +3,5 @@ tqdm
 fuzzyset
 pandas
 dill
-uvicorn
-fastapi
 scikit-learn==0.23.2
-
-#spell_corrector
-symspellpy
-
-#setting default dictionary 
-git+http://github.com/cheesama/soynlp
 
