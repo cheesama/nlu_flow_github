@@ -34,9 +34,17 @@ def train_domain_classifier():
         scenario_data = meta_db_client.get(scenario_table)
         for data in tqdm(scenario_data, desc=f'collecting table data : {scenario_table}'):
             if 'data_type' in data.keys():
-                if data['data_type'] == 'training' and data['intent_id']['Intent_ID'] not in ['intent_미지원', 'intent_OOD']:
-                    utterances.append(preprocess(data['utterance']))
-                    labels.append('scenario')
+                if data['data_type'] == 'training':
+                    if 'faq' in data['intent_id']['Intent_ID'].lower():
+                        utterances.append(preprocess(data['utterance']))
+                        labels.append('faq')
+                    elif data['intent_id']['Intent_ID'] == 'intent_OOD':
+                        utterances.append(preprocess(data['utterance']))
+                        labels.append('out_of_domain')
+                    elif data['intent_id']['Intent_ID'] not in ['intent_미지원']:
+                        utterances.append(preprocess(data['utterance']))
+                        labels.append('scenario')
+ 
             else:
                 utterances.append(preprocess(data['utterance']))
                 labels.append('scenario')
