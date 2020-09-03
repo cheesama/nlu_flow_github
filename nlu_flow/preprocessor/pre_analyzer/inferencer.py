@@ -1,4 +1,5 @@
 from tqdm import tqdm
+from fuzzywuzzy import process, fuzz
 
 from nlu_flow.utils import meta_db_client
 from nlu_flow.preprocessor.text_preprocessor import normalize
@@ -48,8 +49,7 @@ for data in tqdm(faq_rules, desc="storing faq-rules"):
         "intent": "intent_FAQ",
     }
 
-
-def analyze_intent(text: str, analysis_dict: dict):
+def analyze_intent(text: str, analysis_dict: dict, lev_distance_threshold=90):
     text = normalize(text)
 
     ## 1. check intent_name is set directly
@@ -87,6 +87,14 @@ def analyze_intent(text: str, analysis_dict: dict):
 
                 return result
 
-        
+        ## 3. check Levenshtein distance among given text and entire pre_analysis dictionary
+        similarity_result = process.extractOne(text, pre_analysis_dict.keys())
+        similarity_result_info = pre_analysis_dict[similarity_result[0]]
+        similarity_result_info['response'] = similarity_result[0]
+        similarity_result_info['confidence'] = similarity_result[1] * 0.01
+        similarity_result_info['lev_distance_threshold'] = lev_distance_threshold * 0.01
+        similarity_result_info['classifier'] = 'pre_analyzer'
 
+        return similarity_result_info
+        
 
