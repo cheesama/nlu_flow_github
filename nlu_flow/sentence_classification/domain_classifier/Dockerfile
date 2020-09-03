@@ -7,6 +7,7 @@ RUN buildDeps='gcc libc6-dev make' \
     && apt-get update && apt-get install -y $buildDeps git wget tar \
     && pip install --upgrade pip \
     && pip install -r req.txt \
+    && pip install git+http://github.com/cheesama/nlu_flow.git \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get purge -y --auto-remove $buildDeps
 

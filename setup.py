@@ -16,4 +16,4 @@ setup(
     include_package_data=True,
 )
 
-os.system('pip install -r requirments_model.txt')
+os.system('pip install -r requirements_model.txt')
