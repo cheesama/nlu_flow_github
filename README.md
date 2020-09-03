@@ -22,3 +22,8 @@ graph LR
   E[postprocessor] --> EA[rule_entity_filter]
  
 ```
+
+## Reference
+soynlp
+
+strapi

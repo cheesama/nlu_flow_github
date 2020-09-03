@@ -6,7 +6,7 @@ import json
 import ast
 import os, sys
 
-headers = {'accept': 'application/json'}
+headers = {'accept': 'application/json', 'content-type': 'application/json'}
 
 endpoint = os.getenv('META_ENDPOINT')
 
@@ -20,9 +20,10 @@ def request_to_server(
 
     if method == "get":
         response = requests.get(endpoint + url, headers=headers)
-
-    # elif method == "post":
-    #     response = requests.post(endpoint + url, headers=headers, json=data)
+    elif method == "put":
+        response = requests.put(endpoint + url, headers=headers, json=data)
+    elif method == "post":
+        response = requests.post(endpoint + url, headers=headers, json=data)
     #
     # elif method == "patch":
     #     response = requests.patch(endpoint + url, headers=headers, params=params)
@@ -53,7 +54,7 @@ def get(url: str):
         raise ConnectionError("Strapi api failed")
 
     res = []
-    start, iter_num = 0, 200
+    start, iter_num = 0, 50
     len_ = 0
     while len_ < int(cnt):
         tmp_ids = request_to_server('get', url='{}?_start={}&_limit={}'.format(url, start, iter_num))
@@ -61,6 +62,12 @@ def get(url: str):
         start += iter_num
         len_ += len(tmp_ids)
     return res
+
+def put(url, id, data):
+    result = request_to_server('put', url=url + '/' + str(id), data=data)
+
+def post(url, data):
+    result = request_to_server('post', url=url, data=data)
 
 #def get_regexs():
 #    return get('regexes')
