@@ -1,4 +1,5 @@
 from tqdm import tqdm
+from fastapi import FastAPI
 from fuzzywuzzy import process, fuzz
 
 from nlu_flow.utils import meta_db_client
@@ -6,6 +7,9 @@ from nlu_flow.preprocessor.text_preprocessor import normalize
 
 import os, sys
 import random
+
+app = FastAPI()
+is_ready = False
 
 # load pre_analysis_dict from Meta DB
 pre_analysis_dict = {}
@@ -49,7 +53,9 @@ for data in tqdm(faq_rules, desc="storing faq-rules"):
         "intent": "intent_FAQ",
     }
 
-def analyze_intent(text: str, analysis_dict: dict, lev_distance_threshold=90):
+is_ready = True
+
+def analyze_text_with_pre_analyzer(text: str, analysis_dict: dict, lev_distance_threshold=90):
     text = normalize(text)
 
     ## 1. check intent_name is set directly
@@ -97,4 +103,20 @@ def analyze_intent(text: str, analysis_dict: dict, lev_distance_threshold=90):
 
         return similarity_result_info
         
+#endpoints
+@app.get("/")
+async def health():
+    if is_ready:
+        output = {'code': 200}
+    else:
+        output = {'code': 500}
+    return output
+
+@app.post("/pre_analyzer/predict"):
+async def match_pre_analyzer(text: str):
+    return analyze_text_with_pre_analyzer(text)
+
+
+
+
 
