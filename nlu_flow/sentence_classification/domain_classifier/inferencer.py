@@ -14,6 +14,10 @@ with open('./domain_classifier_model.svc', 'rb') as f:
 if model:
     is_ready = True
 
+def preprocess(text: str):
+    text = text.lower().strip().replace(' ','')
+    return text
+
 #endpoints
 @app.get("/")
 async def health():
@@ -25,8 +29,8 @@ async def health():
 
 @app.post("/domain_classifier/predict")
 async def predict_domain(text: str):
-    name = model.predict([text])[0]
-    confidence = model.predict_proba([text])[0].max()
+    name = model.predict([preprocess(text)])[0]
+    confidence = model.predict_proba([preprocess(text)])[0].max()
 
     return {'name': name, 'confidence': confidence, 'Classifier': 'domain_classifier_model.svc'}
 
