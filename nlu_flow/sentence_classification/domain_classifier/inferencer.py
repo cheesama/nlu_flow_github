@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 
+from nlu_flow.preprocessor.text_preprocessor import normalize
+
 import dill
 
 app = FastAPI()
@@ -14,10 +16,6 @@ with open('./domain_classifier_model.svc', 'rb') as f:
 if model:
     is_ready = True
 
-def preprocess(text: str):
-    text = text.lower().strip().replace(' ','')
-    return text
-
 #endpoints
 @app.get("/")
 async def health():
@@ -29,8 +27,8 @@ async def health():
 
 @app.post("/domain_classifier/predict")
 async def predict_domain(text: str):
-    name = model.predict([preprocess(text)])[0]
-    confidence = model.predict_proba([preprocess(text)])[0].max()
+    name = model.predict([normalize(text)])[0]
+    confidence = model.predict_proba([normalize(text)])[0].max()
 
     return {'name': name, 'confidence': confidence, 'Classifier': 'domain_classifier_model.svc'}
 
