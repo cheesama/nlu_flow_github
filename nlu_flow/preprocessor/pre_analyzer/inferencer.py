@@ -27,15 +27,22 @@ for data in tqdm(intent_rules, desc="storing intent-rules"):
 
 chitchat_rules = meta_db_client.get("nlu-chitchat-utterances")
 for data in tqdm(chitchat_rules, desc="storing chitchat-rules"):
-    pre_analysis_dict[normalize(data["utterance"])] = {
-        "intent": "intent_chitchat",
-        "chitchat_class": data["class_name"]["classes"],
-    }
+    try:
+        pre_analysis_dict[normalize(data["utterance"])] = {
+            "intent": "intent_chitchat",
+            "chitchat_class": data["class_name"]["classes"],
+        }
+    except:
+        print (f'check data format: {data}')
+
 chitchat_responses = meta_db_client.get("nlu-chitchat-responses")
 for data in tqdm(chitchat_responses, desc="storing chitchat-responses"):
-    if data["class_name"]["classes"] not in chitchat_response_dict.keys():
-        chitchat_resposne_dict[data["class_name"]["classes"]] = []
-    chitchat_resposne_dict[data["class_name"]["classes"]].append(data["response"])
+    try:
+        if data["class_name"]["classes"] not in chitchat_response_dict.keys():
+            chitchat_response_dict[data["class_name"]["classes"]] = []
+        chitchat_response_dict[data["class_name"]["classes"]].append(data["response"])
+    except:
+        print (f'check data format: {data}')
 
 slang_rules = meta_db_client.get("nlu-slang-utterances")
 for data in tqdm(slang_rules, desc="storing slang-rules"):
@@ -114,7 +121,7 @@ async def health():
 
 @app.post("/pre_analyzer/predict")
 async def match_pre_analyzer(text: str):
-    return analyze_text_with_pre_analyzer(text)
+    return analyze_text_with_pre_analyzer(text, pre_analysis_dict)
 
 
 

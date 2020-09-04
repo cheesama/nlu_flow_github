@@ -1,1 +1,5 @@
 fuzzywuzzy[speedup]
+uvicorn
+fastapi
+requests
+git+http://github.com/cheesama/soynlp.git
