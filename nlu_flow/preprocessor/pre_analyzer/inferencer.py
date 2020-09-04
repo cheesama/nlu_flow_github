@@ -112,7 +112,7 @@ async def health():
         output = {'code': 500}
     return output
 
-@app.post("/pre_analyzer/predict"):
+@app.post("/pre_analyzer/predict")
 async def match_pre_analyzer(text: str):
     return analyze_text_with_pre_analyzer(text)
 
