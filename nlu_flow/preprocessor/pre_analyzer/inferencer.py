@@ -93,9 +93,7 @@ def analyze_text_with_pre_analyzer(text: str, analysis_dict: dict, lev_distance_
                     "intent": "intent_slang",
                     "confidence": 1.0,
                     "classifier": "pre_analyzer",
-                    "response": random.choice(
-                        chitchat_response_dict[result["chitchat_class"]]
-                    ),
+                    "response": random.choice(slang_response_list),
                 }
 
                 return result
@@ -103,10 +101,15 @@ def analyze_text_with_pre_analyzer(text: str, analysis_dict: dict, lev_distance_
         ## 3. check Levenshtein distance among given text and entire pre_analysis dictionary
         similarity_result = process.extractOne(text, pre_analysis_dict.keys())
         similarity_result_info = pre_analysis_dict[similarity_result[0]]
-        similarity_result_info['response'] = similarity_result[0]
-        similarity_result_info['confidence'] = similarity_result[1] * 0.01
-        similarity_result_info['lev_distance_threshold'] = lev_distance_threshold * 0.01
-        similarity_result_info['classifier'] = 'pre_analyzer'
+
+        ## 3-1. when chitchat is detected, choose response from same chitchat_class
+        if 'chitchat_class' in similarity_result_info:
+            similarity_result_info['response'] =  random.choice(chitchat_response_dict[similarity_result_info["chitchat_class"]])
+        else:
+            similarity_result_info['response'] = similarity_result[0]
+            similarity_result_info['confidence'] = similarity_result[1] * 0.01
+            similarity_result_info['lev_distance_threshold'] = lev_distance_threshold * 0.01
+            similarity_result_info['classifier'] = 'pre_analyzer'
 
         return similarity_result_info
         
