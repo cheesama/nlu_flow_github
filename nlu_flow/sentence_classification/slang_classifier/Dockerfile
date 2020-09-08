@@ -13,7 +13,7 @@ RUN buildDeps='gcc libc6-dev make' \
 
 WORKDIR /workspace/
 COPY inferencer.py /workspace/inferencer.py
-COPY domain_classifier_model.svc /workspace/domain_classifier_model.svc
+COPY domain_classifier_model.svc /workspace/slang_classifier_model.svc
 
 EXPOSE  8000
 CMD ["uvicorn", "inferencer:app", "--reload", "--host=0.0.0.0", "--port=8000"]

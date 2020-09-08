@@ -5,6 +5,7 @@ import requests
 import json
 import ast
 import os, sys
+import multiprocessing
 
 headers = {'accept': 'application/json', 'content-type': 'application/json'}
 
@@ -24,12 +25,8 @@ def request_to_server(
         response = requests.put(endpoint + url, headers=headers, json=data)
     elif method == "post":
         response = requests.post(endpoint + url, headers=headers, json=data)
-    #
-    # elif method == "patch":
-    #     response = requests.patch(endpoint + url, headers=headers, params=params)
-    #
-    # elif method == "delete":
-    #     response = requests.delete(endpoint + url, headers=headers)
+    elif method == "delete":
+        response = requests.delete(endpoint + url, headers=headers)
 
     response.encoding = None
     try:
@@ -56,11 +53,15 @@ def get(url: str):
     res = []
     start, iter_num = 0, 50
     len_ = 0
+    pbar = tqdm(total=cnt, position=0, leave=True)
     while len_ < int(cnt):
         tmp_ids = request_to_server('get', url='{}?_start={}&_limit={}'.format(url, start, iter_num))
         res.extend(tmp_ids)
         start += iter_num
         len_ += len(tmp_ids)
+        pbar.update(len(tmp_ids))
+
+    pbar.close()
     return res
 
 def put(url, id, data):
@@ -68,6 +69,9 @@ def put(url, id, data):
 
 def post(url, data):
     result = request_to_server('post', url=url, data=data)
+
+def delete(url, id):
+    result = request_to_server('delete', url=url + '/' + str(id))
 
 #def get_regexs():
 #    return get('regexes')
