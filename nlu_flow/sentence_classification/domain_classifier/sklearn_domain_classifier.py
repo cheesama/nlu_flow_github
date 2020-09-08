@@ -27,7 +27,9 @@ def train_domain_classifier():
     for scenario_table in scenario_table_list:
         scenario_data = meta_db_client.get(scenario_table)
         for data in tqdm(scenario_data, desc=f'collecting table data : {scenario_table}'):
-            if 'data_type' in data.keys():
+            if type(data) != dict:
+                print (f'check data type : {data}')
+            elif 'data_type' in data.keys():
                 if data['data_type'] == 'training':
                     if 'faq' in data['intent_id']['Intent_ID'].lower():
                         utterances.append(normalize(data['utterance']))
