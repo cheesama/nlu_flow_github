@@ -22,6 +22,8 @@ def train_domain_classifier():
 
     utterances = []
     labels = []
+
+    total_scenario_utter_num = 0
     
     ## scenario domain
     for scenario_table in scenario_table_list:
@@ -29,7 +31,11 @@ def train_domain_classifier():
         for data in tqdm(scenario_data, desc=f'collecting table data : {scenario_table}'):
             if type(data) != dict:
                 print (f'check data type : {data}')
-            elif 'data_type' in data.keys():
+                continue
+
+            total_scenario_utter_num += 1
+
+            if 'data_type' in data.keys():
                 if data['data_type'] == 'training':
                     if 'faq' in data['intent_id']['Intent_ID'].lower():
                         utterances.append(normalize(data['utterance']))
@@ -58,6 +64,13 @@ def train_domain_classifier():
         for data in tqdm(ood_data, desc=f'collecting table data : {ood_table}'):
             utterances.append(normalize(data['utterance']))
             labels.append('out_of_domain')
+
+    ### add some additional out of domain data for avoing class imbalance
+    slang_training_data = meta_db_client.get('nlu-slang-trainings')
+    for i, data in tqdm(enumerate(slang_training_data), desc=f'collecting table data : nlu-slang-trainings ...'):
+        if i > total_scenario_utter_num: break
+        utterances.append(normalize(data['utterance']))
+        labels.append('out_of_domain')
 
     X_train, X_test, y_train, y_test = train_test_split(utterances, labels, random_state=88)
 
