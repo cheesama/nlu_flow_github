@@ -1,10 +1,15 @@
 from tqdm import tqdm
+from fastapi import FastAPI
+from fuzzywuzzy import process, fuzz
 
 from nlu_flow.utils import meta_db_client
 from nlu_flow.preprocessor.text_preprocessor import normalize
 
 import os, sys
 import random
+
+app = FastAPI()
+is_ready = False
 
 # load pre_analysis_dict from Meta DB
 pre_analysis_dict = {}
@@ -22,15 +27,22 @@ for data in tqdm(intent_rules, desc="storing intent-rules"):
 
 chitchat_rules = meta_db_client.get("nlu-chitchat-utterances")
 for data in tqdm(chitchat_rules, desc="storing chitchat-rules"):
-    pre_analysis_dict[normalize(data["utterance"])] = {
-        "intent": "intent_chitchat",
-        "chitchat_class": data["class_name"]["classes"],
-    }
+    try:
+        pre_analysis_dict[normalize(data["utterance"])] = {
+            "intent": "intent_chitchat",
+            "chitchat_class": data["class_name"]["classes"],
+        }
+    except:
+        print (f'check data format: {data}')
+
 chitchat_responses = meta_db_client.get("nlu-chitchat-responses")
 for data in tqdm(chitchat_responses, desc="storing chitchat-responses"):
-    if data["class_name"]["classes"] not in chitchat_response_dict.keys():
-        chitchat_resposne_dict[data["class_name"]["classes"]] = []
-    chitchat_resposne_dict[data["class_name"]["classes"]].append(data["response"])
+    try:
+        if data["class_name"]["classes"] not in chitchat_response_dict.keys():
+            chitchat_response_dict[data["class_name"]["classes"]] = []
+        chitchat_response_dict[data["class_name"]["classes"]].append(data["response"])
+    except:
+        print (f'check data format: {data}')
 
 slang_rules = meta_db_client.get("nlu-slang-utterances")
 for data in tqdm(slang_rules, desc="storing slang-rules"):
@@ -48,8 +60,9 @@ for data in tqdm(faq_rules, desc="storing faq-rules"):
         "intent": "intent_FAQ",
     }
 
+is_ready = True
 
-def analyze_intent(text: str, analysis_dict: dict):
+def analyze_text_with_pre_analyzer(text: str, analysis_dict: dict, lev_distance_threshold=90):
     text = normalize(text)
 
     ## 1. check intent_name is set directly
@@ -80,13 +93,40 @@ def analyze_intent(text: str, analysis_dict: dict):
                     "intent": "intent_slang",
                     "confidence": 1.0,
                     "classifier": "pre_analyzer",
-                    "response": random.choice(
-                        chitchat_response_dict[result["chitchat_class"]]
-                    ),
+                    "response": random.choice(slang_response_list),
                 }
 
                 return result
 
+        ## 3. check Levenshtein distance among given text and entire pre_analysis dictionary
+        similarity_result = process.extractOne(text, pre_analysis_dict.keys())
+        similarity_result_info = pre_analysis_dict[similarity_result[0]]
+
+        ## 3-1. when chitchat is detected, choose response from same chitchat_class
+        if 'chitchat_class' in similarity_result_info:
+            similarity_result_info['response'] =  random.choice(chitchat_response_dict[similarity_result_info["chitchat_class"]])
+        else:
+            similarity_result_info['response'] = similarity_result[0]
+            similarity_result_info['confidence'] = similarity_result[1] * 0.01
+            similarity_result_info['lev_distance_threshold'] = lev_distance_threshold * 0.01
+            similarity_result_info['classifier'] = 'pre_analyzer'
+
+        return similarity_result_info
         
+#endpoints
+@app.get("/")
+async def health():
+    if is_ready:
+        output = {'code': 200}
+    else:
+        output = {'code': 500}
+    return output
+
+@app.post("/pre_analyzer/predict")
+async def match_pre_analyzer(text: str):
+    return analyze_text_with_pre_analyzer(text, pre_analysis_dict)
+
+
+
 
 

@@ -67,6 +67,7 @@ def train_domain_classifier():
     print(classification_report(y_test, y_pred))
 
     with open('report.md', 'w') as reportFile:
+        print('domain classification result', file=reportFile)
         print(classification_report(y_test, y_pred), file=reportFile)
 
     #save domain classifier model
