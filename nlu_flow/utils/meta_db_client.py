@@ -43,7 +43,7 @@ def validate_api_output(api_result):
     return True
 
 # get data from url(table)
-def get(url: str):
+def get(url: str, max_num=-1):
     cnt = request_to_server('get', '{}/count'.format(url))
     if not validate_api_output(cnt):
         raise ConnectionError("Strapi api failed")
@@ -60,6 +60,9 @@ def get(url: str):
         start += iter_num
         len_ += len(tmp_ids)
         pbar.update(len(tmp_ids))
+
+        if max_num > 0 and len_ > max:
+            break
 
     pbar.close()
     return res

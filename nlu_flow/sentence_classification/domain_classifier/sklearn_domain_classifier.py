@@ -25,6 +25,8 @@ def train_domain_classifier():
     labels = []
 
     total_scenario_utter_num = 0
+    total_faq_utter_num = 0
+    total_OOD_utter_num = 0
 
     ## scenario domain
     for scenario_table in scenario_table_list:
@@ -75,6 +77,9 @@ def train_domain_classifier():
         for data in tqdm(faq_data, desc=f"collecting table data : {faq_table}"):
             target_utterance = normalize(data["question"])
 
+            if total_faq_utter_num > max(total_scenario_utter_num, total_OOD_utter_num):
+                break
+
             # check synonym is included
             for synonym_list in synonyms:
                 for i, prev_value in enumerate(synonym_list):
@@ -86,10 +91,12 @@ def train_domain_classifier():
                                 target_utterance.replace(prev_value, post_value)
                             )
                             labels.append("faq")
+                            total_faq_utter_num += 1
                         break
 
             utterances.append(target_utterance)
             labels.append("faq")
+            total_faq_utter_num += 1
 
     ## out of domain
     for ood_table in out_of_domain_table_list:
@@ -97,9 +104,10 @@ def train_domain_classifier():
         for data in tqdm(ood_data, desc=f"collecting table data : {ood_table}"):
             utterances.append(normalize(data["utterance"]))
             labels.append("out_of_domain")
+            total_OOD_utter_num += 1
 
     ### add some additional out of domain data for avoing class imbalance
-    slang_training_data = meta_db_client.get("nlu-slang-trainings")
+    slang_training_data = meta_db_client.get("nlu-slang-trainings", max_num=total_scenario_utter_num)
     for i, data in tqdm(
         enumerate(slang_training_data),
         desc=f"collecting table data : nlu-slang-trainings ...",
@@ -108,10 +116,16 @@ def train_domain_classifier():
             break
         utterances.append(normalize(data["utterance"]))
         labels.append("out_of_domain")
+        total_OOD_utter_num += 1
 
     X_train, X_test, y_train, y_test = train_test_split(
         utterances, labels, random_state=88
     )
+
+    print ('utterance data distribution')
+    print (f'scenario : {total_scenario_utter_num}')
+    print (f'FAQ : {total_faq_utter_num}')
+    print (f'out of domain : {total_OOD_utter_num}')
 
     svc = make_pipeline(CountVectorizer(analyzer="char_wb"), SVC(probability=True))
     print("domain classifier training(with SVC)")
