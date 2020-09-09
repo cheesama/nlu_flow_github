@@ -61,7 +61,7 @@ def get(url: str, max_num=-1):
         len_ += len(tmp_ids)
         pbar.update(len(tmp_ids))
 
-        if max_num > 0 and len_ > max:
+        if 0 < max_num and max_num < len_:
             break
 
     pbar.close()
