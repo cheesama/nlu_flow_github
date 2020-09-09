@@ -114,6 +114,11 @@ def train_domain_classifier():
     ):
         if i > total_scenario_utter_num:
             break
+
+        if type(data) != dict:
+            print (f'check data type: {data}')
+            continue
+
         utterances.append(normalize(data["utterance"]))
         labels.append("out_of_domain")
         total_OOD_utter_num += 1
