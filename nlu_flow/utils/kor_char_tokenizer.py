@@ -6,6 +6,8 @@ sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 
 from preprocessor.text_preprocessor import normalize
 
+PAD_TOKEN_ID=2
+
 class KorCharTokenizer:
     '''
     a ~ z : 97 ~ 122
@@ -18,9 +20,20 @@ class KorCharTokenizer:
         self.char_dict = {}
         self.char_dict[0] = '[CLS]'
         self.char_dict[1] = '[SEP]'
-        self.char_dict[2] = '[PAD]'
+        self.char_dict[PAD_TOKEN_ID] = '[PAD]'
         self.char_dict[3] = '[UNK]'
         self.char_dict[4] = ' '
+        self.char_dict[5] = '!'
+        self.char_dict[6] = '?'
+        self.char_dict[7] = '^'
+
+       # 0 ~ 9 mapping
+        for i in range(48, 58):
+            self.char_dict[len(self.char_dict)] = chr(i)
+
+       # A ~ Z mapping
+        for i in range(65, 91):
+            self.char_dict[len(self.char_dict)] = chr(i)
 
         # a ~ z mapping
         for i in range(97, 123):
@@ -34,13 +47,15 @@ class KorCharTokenizer:
         for k, v in self.char_dict.items():
             self.char_token_dict[v] = k
 
-    def tokenize(self, text):
-        text = normalize(text)
-        tokens = []
-        tokens.append(0) # append CLS token default as BOS
+    def tokenize(self, text, norm=False):
+        if norm:
+            text = normalize(text)
+        tokens = [0] # append CLS token default as BOS
 
         for char in text:
-            if 97 <= ord(char) <=122 or 44032 <= ord(char) <= 55203:
+            char = str(char)[0]
+        
+            if 48 <= ord(char) < 58 or 65 <= ord(char) < 91 or 97 <=ord(char) < 123 or 44032 <= ord(char) < 55204:
                 tokens.append(self.char_token_dict[char])
             else:
                 tokens.append(4) #unknown token
@@ -48,7 +63,15 @@ class KorCharTokenizer:
         tokens.append(1) # append SEP token default as EOS
 
         if len(tokens) < self.max_len:
-            tokens +=  ([2] * (sel.max_len - len(tokens)))
+            tokens +=  ([PAD_TOKEN_ID] * (self.max_len - len(tokens)))
 
+        return tokens[:self.max_len]
 
+    def get_vocab_size(self):
+        return len(self.char_dict)
 
+    def get_pad_token_id(self):
+        return PAD_TOKEN_ID
+
+    def get_seq_len(self):
+        return self.max_len
