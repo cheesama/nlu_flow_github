@@ -25,6 +25,10 @@ def train_slang_classifier():
     # load dataset
     slang_data = meta_db_client.get("nlu-slang-trainings")
     for data in tqdm(slang_data, desc=f"collecting slang data..."):
+        if type(data) != dict:
+            print (f'check data type: {data}')
+            continue
+
         if data["data_type"] == "train":
             X_train.append(normalize(data["utterance"]))
             y_train.append(data["label"])

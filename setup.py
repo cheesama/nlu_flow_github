@@ -6,12 +6,12 @@ with open("requirements.txt") as f:
 
 setup(
     name="nlu_flow",
-    version="0.0.1",
+    version="0.0.2",
     description="Natural Language Flow",
     author="Cheesama",
     install_requires=[required],
     packages=find_packages(exclude=["docs", "tests", "tmp", "data"]),
-    python_requires=">=3",
+    python_requires=">=3.8",
     zip_safe=False,
     include_package_data=True,
 )
