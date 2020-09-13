@@ -9,6 +9,7 @@ from nlu_flow.utils.kor_char_tokenizer import KorCharTokenizer
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torch.optim import Adam
+from torch.utils.tensorboard import SummaryWriter
 import torch
 import torch.nn as nn
 
@@ -61,17 +62,27 @@ model = EmbeddingTransformer(
     pad_token_id=tokenizer.get_pad_token_id(),
 )
 
+if torch.cuda.is_available():
+    model = mode.cuda()
+
 # train model
 n_epochs = 10
 lr = 0.001
 optimizer = Adam(model.parameters(), lr=lr)
 loss_fn = nn.CrossEntropyLoss()
 
+writer = SummaryWriter()
+global_step = 0
+
 for epoch in range(1, n_epochs + 1):
     model.train()
 
     progress = tqdm(enumerate(train_loader), leave=False)
     for batch_idx, (question, answer) in progress:
+        if torch.cuda.is_available():
+            question = question.cuda()
+            answer = answer.cuda()
+
         optimizer.zero_grad()
         pred = model(question)
 
@@ -79,6 +90,8 @@ for epoch in range(1, n_epochs + 1):
         loss.backward()
         optimizer.step()
 
-        progress.set_description(f'training model, epoch:{epoch}, loss:{loss.item()}')
+        progress.set_description(f'training model, epoch:{epoch}, loss:{loss.cpu().item()}')
+        writer.add_scalar('Loss/train', loss.cpu().item(), global_step)
+        global_step += 1
 
     torch.save(model.state_dict(), 'transformer_chitchat_response_model.modeldict')
