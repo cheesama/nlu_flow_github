@@ -66,7 +66,7 @@ model = EmbeddingTransformer(
 )
 
 if torch.cuda.is_available():
-    model = mode.cuda()
+    model = model.cuda()
 
 # train model
 n_epochs = 10
