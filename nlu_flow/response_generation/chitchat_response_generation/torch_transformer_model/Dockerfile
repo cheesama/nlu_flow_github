@@ -8,12 +8,14 @@ RUN buildDeps='gcc libc6-dev make' \
     && pip install --upgrade pip \
     && pip install -r req.txt \
     && pip install git+http://github.com/cheesama/nlu_flow.git \
+    && pip install git+http://github.com/cheesama/soynlp.git \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get purge -y --auto-remove $buildDeps
 
 WORKDIR /workspace/
+COPY embedding_transformer.py /workspace/embedding_transformer.py
+COPY transformer_chitchat_response_model.modeldict /workspace/transformer_chitchat_response_model.modeldict
 COPY inferencer.py /workspace/inferencer.py
-COPY domain_classifier_model.svc /workspace/domain_classifier_model.svc
 
 EXPOSE  8000
 CMD ["uvicorn", "inferencer:app", "--reload", "--host=0.0.0.0", "--port=8000"]
