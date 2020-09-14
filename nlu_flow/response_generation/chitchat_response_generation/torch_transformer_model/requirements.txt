@@ -1,4 +1,6 @@
+fastapi
+uvicorn
+requests
 numpy
 torch
 Korpora
-

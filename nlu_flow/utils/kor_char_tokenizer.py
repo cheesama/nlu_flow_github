@@ -67,6 +67,19 @@ class KorCharTokenizer:
 
         return tokens[:self.max_len]
 
+    def decode(self, tokens):
+        result = ''
+        for token in tokens:
+            if token == 1: #means EOS
+                break
+
+            if 0 <= token <= 3:
+                continue
+
+            result += self.char_dict[token]
+ 
+        return result
+
     def get_vocab_size(self):
         return len(self.char_dict)
 
