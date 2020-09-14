@@ -42,6 +42,10 @@ async def generate_response(text: str):
     tokens = tokenizer.tokenize(text)
 
     pred = model(torch.LongTensor(tokens).unsqueeze(0))
+    pred = pred.argmax(2)[0].numpy()
+
+    print (pred)
+
     response = tokenizer.decode(pred)
 
     return {

@@ -43,7 +43,7 @@ class EmbeddingTransformer(nn.Module):
             # (N,S,E) -> (S,N,E) => (T,N,E) -> (N,T,E)
             #entity_feature = self.entity_encoder(entity_feature.transpose(1, 0)).transpose(1, 0)
             feature = self.encoder(feature.transpose(1, 0), src_key_padding_mask=src_key_padding_mask).transpose(1, 0)
-            feature = feature.masked_fill(torch.isnan(feature), 0)
+            #feature = feature.masked_fill(torch.isnan(feature), 0)
 
         pred = self.feature(feature)
 

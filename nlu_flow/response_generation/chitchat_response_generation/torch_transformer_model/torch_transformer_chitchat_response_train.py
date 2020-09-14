@@ -41,6 +41,9 @@ class ChatbotKorpusDataset(torch.utils.data.Dataset):
         question_tensor = torch.LongTensor(self.tokenizer.tokenize(self.dataset[idx][0]))
         answer_tensor = torch.LongTensor(self.tokenizer.tokenize(self.dataset[idx][1]))
 
+        #print (f'question_tokens: {self.dataset[idx][0]}')
+        #print (f'answer_tokens: {self.dataset[idx][1]}')
+
         return question_tensor, answer_tensor
 
 questions = []
@@ -67,11 +70,11 @@ if torch.cuda.is_available():
 
 # train model
 n_epochs = 10
-lr = 0.001
+lr = 0.0001
 optimizer = Adam(model.parameters(), lr=lr)
-loss_fn = nn.CrossEntropyLoss()
+loss_fn = nn.CrossEntropyLoss(ignore_index=tokenizer.get_pad_token_id())
 
-writer = SummaryWriter()
+writer = SummaryWriter(log_dir=f'runs/epochs:{n_epochs}_lr:{lr}')
 global_step = 0
 
 for epoch in range(1, n_epochs + 1):
