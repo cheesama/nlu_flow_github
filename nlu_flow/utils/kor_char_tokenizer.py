@@ -47,7 +47,7 @@ class KorCharTokenizer:
         for k, v in self.char_dict.items():
             self.char_token_dict[v] = k
 
-    def tokenize(self, text, norm=False):
+    def tokenize(self, text, padding=True, norm=False):
         if norm:
             text = normalize(text)
         tokens = [0] # append CLS token default as BOS
@@ -62,7 +62,7 @@ class KorCharTokenizer:
 
         tokens.append(1) # append SEP token default as EOS
 
-        if len(tokens) < self.max_len:
+        if padding and len(tokens) < self.max_len:
             tokens +=  ([PAD_TOKEN_ID] * (self.max_len - len(tokens)))
 
         #print (tokens[:self.max_len])
