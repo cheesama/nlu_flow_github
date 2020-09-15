@@ -41,10 +41,17 @@ async def generate_response(text: str):
     max_len = model.max_seq_len
     tokens = tokenizer.tokenize(text)
 
-    pred = model(torch.LongTensor(tokens).unsqueeze(0))
-    pred = pred.argmax(2)[0].numpy()
+    while True:
+        pred = model(torch.LongTensor(tokens).unsqueeze(0))
+        pred = pred.argmax(2)[0].numpy()
 
-    print (pred)
+        if len(tokens) >= tokenizer.max_len:
+            break
+
+        if pred[len(tokens) + 1] == 1: #1 means EOS token
+            break
+
+        tokens += pred[len(tokens)]
 
     response = tokenizer.decode(pred)
 

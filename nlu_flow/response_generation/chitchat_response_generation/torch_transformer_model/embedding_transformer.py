@@ -44,7 +44,7 @@ class EmbeddingTransformer(nn.Module):
 
     def forward(self, x, entity_labels=None):
         embedding = self.embedding(x)
-        mask = self._generate_square_subsequent_mask(len(x)).to(x.device)
+        mask = self._generate_square_subsequent_mask(x.size(1)).to(x.device)
         src_key_padding_mask = x == self.pad_token_id
 
         feature = embedding + self.position_embedding(
