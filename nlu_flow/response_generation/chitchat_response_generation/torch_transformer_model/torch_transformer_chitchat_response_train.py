@@ -24,40 +24,38 @@ tokenizer = KorCharTokenizer()
 
 # prepare torch dataset
 class ChatbotKorpusDataset(torch.utils.data.Dataset):
-    def __init__(self, questions, answers, tokenizer):
+    def __init__(self, questions, answers, tokenizer, padding=True):
         assert len(questions) == len(answers)
 
         self.tokenizer = tokenizer
         self.dataset = []
+        self.padding = padding
 
         for i, question in tqdm(enumerate(questions), desc="preparing data ..."):
             question_tokens = self.tokenizer.tokenize(questions[i], padding=False)
             answer_tokens = self.tokenizer.tokenize(answers[i], padding=False)
+            #print (f'question_tokens : {len(question_tokens)}')
+            #print (f'answer_tokens : {len(answer_tokens)}')
+            entire_tokens = question_tokens + answer_tokens[1:] # except asnwer tokens BOS token
+            #print (f'entire_tokens : {len(entire_tokens)}')
+            if self.padding:
+                if len(entire_tokens) < self.tokenizer.max_len + 1:
+                    entire_tokens += [self.tokenizer.get_pad_token_id()] * (
+                        self.tokenizer.max_len - len(entire_tokens) + 1
+                    )
 
-            entire_tokens = (
-                question_tokens + answer_tokens[1:]
-            )  # except asnwer tokens BOS token
-            if len(entire_tokens) < self.tokenizer.max_len + 1:
-                entire_tokens += [self.tokenizer.get_pad_token_id()] * (
-                    self.tokenizer.max_len - len(entire_tokens) + 1
+                self.dataset.append(
+                    (entire_tokens[: self.tokenizer.max_len], entire_tokens[1:])
                 )
-
-            self.dataset.append(
-                (entire_tokens[: self.tokenizer.max_len], entire_tokens[1:])
-            )
+            else:
+                entire_tokens = entire_tokens[:self.tokenizer.max_len]
+                self.dataset.append((entire_tokens[:-1], entire_tokens[1:]))
 
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        question_tensor = torch.LongTensor(self.dataset[idx][0])
-        answer_tensor = torch.LongTensor(self.dataset[idx][1])
-
-        # print (f'question_tokens: {self.dataset[idx][0]}')
-        # print (f'answer_tokens: {self.dataset[idx][1]}')
-        # print (f'answer_tensor: {answer_tensor}')
-
-        return question_tensor, answer_tensor
+        return self.dataset[idx][0], self.dataset[idx][1]
 
 
 questions = []
@@ -67,8 +65,21 @@ for qa in chatbot_corpus.train:
     questions.append(qa.text)
     answers.append(qa.pair)
 
-train_dataset = ChatbotKorpusDataset(questions, answers, tokenizer)
+train_dataset = ChatbotKorpusDataset(questions, answers, tokenizer, padding=False)
 
+def sequence_collate_fn(batch):
+    min_token_length = tokenizer.max_len
+
+    for i in range(len(batch)):
+        min_token_length = min(min_token_length, len(batch[i][0]))
+
+    question_tensor = torch.LongTensor([q_tokens[:min_token_length] for q_tokens, a_tokens in batch])
+    answer_tensor = torch.LongTensor([a_tokens[:min_token_length] for q_tokens, a_tokens in batch])
+
+    #print (f'q: {question_tensor}')
+    #print (f'a: {answer_tensor}')
+
+    return question_tensor, answer_tensor
 
 def train_model(n_epochs=20, lr=0.0001):
     batch_size = tokenizer.max_len
@@ -78,7 +89,7 @@ def train_model(n_epochs=20, lr=0.0001):
         batch_size=batch_size,
         num_workers=multiprocessing.cpu_count(),
         drop_last=True,
-        # collate_fn=seq_collate_fn,
+        collate_fn=sequence_collate_fn,
     )
 
     # model definition
