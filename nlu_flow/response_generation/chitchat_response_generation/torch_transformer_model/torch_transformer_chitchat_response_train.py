@@ -100,10 +100,11 @@ def train_model(n_epochs=20, lr=0.0001):
 
             loss = loss_fn(pred.transpose(1, 2), answer)
             loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
 
             progress.set_description(
-                f"training model, epoch:{epoch}, loss:{loss.cpu().item()}"
+                    f"training model, epoch:{epoch}, iter: {global_step}, loss:{loss.cpu().item()}"
             )
             writer.add_scalar("Loss/train", loss.cpu().item(), global_step)
             global_step += 1
