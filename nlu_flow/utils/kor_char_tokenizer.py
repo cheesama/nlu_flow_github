@@ -58,12 +58,14 @@ class KorCharTokenizer:
             if 48 <= ord(char) < 58 or 65 <= ord(char) < 91 or 97 <=ord(char) < 123 or 44032 <= ord(char) < 55204:
                 tokens.append(self.char_token_dict[char])
             else:
-                tokens.append(4) #unknown token
+                tokens.append(3) #unknown token
 
         tokens.append(1) # append SEP token default as EOS
 
         if len(tokens) < self.max_len:
             tokens +=  ([PAD_TOKEN_ID] * (self.max_len - len(tokens)))
+
+        #print (tokens[:self.max_len])
 
         return tokens[:self.max_len]
 
