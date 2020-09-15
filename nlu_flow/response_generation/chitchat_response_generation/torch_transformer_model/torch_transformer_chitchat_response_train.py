@@ -77,6 +77,7 @@ def train_model(n_epochs=20, lr=0.0001):
         train_dataset,
         batch_size=batch_size,
         num_workers=multiprocessing.cpu_count(),
+        drop_last=True,
         # collate_fn=seq_collate_fn,
     )
 
