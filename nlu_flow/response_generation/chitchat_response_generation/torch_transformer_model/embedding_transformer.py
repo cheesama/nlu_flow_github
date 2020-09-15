@@ -10,7 +10,7 @@ class EmbeddingTransformer(nn.Module):
         self,
         vocab_size: int,
         max_seq_len: int,
-        num_encoder_layers=8,
+        num_encoder_layers=12,
         d_model=256,
         nhead=8,
         pad_token_id: int = 1,
@@ -45,7 +45,7 @@ class EmbeddingTransformer(nn.Module):
     def forward(self, x, entity_labels=None):
         embedding = self.embedding(x)
         mask = self._generate_square_subsequent_mask(x.size(1)).to(x.device)
-        src_key_padding_mask = x == self.pad_token_id
+        #src_key_padding_mask = x == self.pad_token_id
 
         feature = embedding + self.position_embedding(
             torch.arange(x.size(1)).type_as(x)
@@ -55,7 +55,7 @@ class EmbeddingTransformer(nn.Module):
         feature = self.encoder(
             feature.transpose(1, 0),
             mask=mask,
-            src_key_padding_mask=src_key_padding_mask,
+            #src_key_padding_mask=src_key_padding_mask,
         ).transpose(1, 0)
 
         pred = self.feature(feature)
