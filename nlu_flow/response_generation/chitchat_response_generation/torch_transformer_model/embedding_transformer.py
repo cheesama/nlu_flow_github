@@ -12,7 +12,7 @@ class EmbeddingTransformer(nn.Module):
         max_seq_len: int,
         num_encoder_layers=12,
         d_model=256,
-        nhead=8,
+        nhead=16,
         pad_token_id: int = 1,
     ):
         super(EmbeddingTransformer, self).__init__()
