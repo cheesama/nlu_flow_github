@@ -1,2 +1,6 @@
+korpora
+
 transformers
 torch
+
+faiss
