@@ -7,7 +7,6 @@ RUN buildDeps='gcc libc6-dev make libgomp1' \
     && apt-get update && apt-get install -y $buildDeps git wget tar \
     && pip install --upgrade pip \
     && pip install -r req.txt \
-    && pip install git+http://github.com/SKT-AI/KoGPT2.git \
     && rm -rf /var/lib/apt/lists/* 
 
 WORKDIR /workspace/

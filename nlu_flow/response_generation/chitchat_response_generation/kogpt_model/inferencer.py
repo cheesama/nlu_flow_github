@@ -1,18 +1,18 @@
 from fastapi import FastAPI
-from kogpt2.pytorch_kogpt2 import get_pytorch_kogpt2_model
-from gluonnlp.data import SentencepieceTokenizer
-from kogpt2.utils import get_tokenizer
+from kogpt2_transformers import get_kogpt2_model, get_kogpt2_tokenizer
 
 import torch
+torch.manual_seed(88)
+
+model = None
 
 app = FastAPI()
 is_ready = False
 
-tok_path = get_tokenizer()
-model, vocab = get_pytorch_kogpt2_model()
-tok = SentencepieceTokenizer(tok_path, num_best=0, alpha=0)
+model = get_kogpt2_model()
+tokenizer = get_kogpt2_tokenizer()
 
-if model:
+if model is not None:
     is_ready = True
 
 # endpoints
@@ -26,28 +26,14 @@ async def health():
 
 
 @app.post("/response_generator/generate")
-async def gererate_chitchat_repsonse(sent: str):
-    question = sent
-    max_len = 128
-
-    toked = tok(sent)
-
-    while True:
-        input_ids = torch.tensor([vocab[vocab.bos_token],] + vocab[toked]).unsqueeze(0)
-        pred = model(input_ids)[0]
-        gen = vocab.to_tokens(torch.argmax(pred, axis=-1).squeeze().tolist())[-1]
-
-        if gen == "</s>":
-            break
-        sent += gen.replace("▁", " ")
-        toked = tok(sent)
-
-        print (sent)
-
-        if len(sent) > max_len:
-            break
+async def gererate_chitchat_repsonse(test: str):
+    input_ids = tokenizer.encode(test, add_special_tokens=False, return_tensors="pt")
+    generated_sequence = model.generate(input_ids=input_ids, do_sample=True, max_length=100, num_return_sequences=1)[0]
+    generated_sequence = generated_sequence.tolist()
+    response = tokenizer.decode(generated_sequence, clean_up_tokenization_spaces=True)
+    print("GENERATED SEQUENCE : {0}".format(response))
 
     return {
-        "response": sent.replace(question, ''),
-        "generator": "KoGPT2",
+        "response": response,
+        "generator": "KoGPT2-Transformers",
     }

@@ -20,6 +20,7 @@ model = EmbeddingTransformer(
     pad_token_id=tokenizer.get_pad_token_id(),
 )
 model.load_state_dict(torch.load('transformer_chitchat_response_model.modeldict',  map_location=lambda storage, loc: storage))
+model.eval()
 
 if model is not None:
     is_ready = True
