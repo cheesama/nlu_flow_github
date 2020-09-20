@@ -110,7 +110,7 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
                 label = label.cuda()
 
             optimizer.zero_grad()
-            loss = model(question, answer, label)
+            loss, pos_loss, neg_loss = model(question, answer, label)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
@@ -118,7 +118,9 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
             progress.set_description(
                 f"training model, epoch:{epoch}, iter: {global_step}, loss:{loss.cpu().item()}"
             )
-            writer.add_scalar("Loss/train", loss.cpu().item(), global_step)
+            writer.add_scalar("train/loss", loss.cpu().item(), global_step)
+            writer.add_scalar("train/pos_loss", pos_loss.cpu().item(), global_step)
+            writer.add_scalar("train/neg_loss", neg_loss.cpu().item(), global_step)
             global_step += 1
 
         torch.save(model.state_dict(), "transformer_chitchat_retrieval_model.modeldict")
