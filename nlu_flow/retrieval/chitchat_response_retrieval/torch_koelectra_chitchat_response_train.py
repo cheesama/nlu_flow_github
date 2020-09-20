@@ -73,9 +73,10 @@ for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...')
     if question['class_name'] is None:
         continue
 
-    questions.append(question['utterance'])
-    answers.append(random.choice(chitchat_class_dict[question['class_name']['classes']][1]))
-    labels.append(chitchat_class_dict[question['class_name']['classes']][0])
+    for each_answer in chitchat_class_dict[question['class_name']['classes']][1]:
+        questions.append(question['utterance'])
+        answers.append(each_answer)
+        labels.append(chitchat_class_dict[question['class_name']['classes']][0])
 
 train_dataset = ChatbotKorpusDataset(questions, answers, tokenizer)
 
