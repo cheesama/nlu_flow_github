@@ -34,14 +34,9 @@ class KoelectraQAFineTuner(nn.Module):
         neg_pair = (label != label.transpose(1,0)).float()
 
         #ignore negative similarity of negative pair
-        neg_loss = (neg_pair * sim_value).clamp(min=0.0).mean()
-        pos_loss = (pos_pair * sim_value).mean()
-        loss = 1 + neg_loss - pos_loss
-
-        print ()
-        print (f'neg_loss: {neg_loss.item()}')
-        print (f'pos_loss: {pos_loss.item()}')
-        print (f'loss: {loss.item()}')
+        neg_loss = (1 + (neg_pair * sim_value)).clamp(min=0.0).mean()
+        pos_loss = (1 - (pos_pair * sim_value)).mean()
+        loss = neg_loss - pos_loss
 
         return loss, pos_loss, neg_loss
 
