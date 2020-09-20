@@ -4,3 +4,6 @@ transformers
 torch
 
 faiss
+
+fastapi
+requests
