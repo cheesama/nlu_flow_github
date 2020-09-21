@@ -38,8 +38,8 @@ class ChatbotKorpusDataset(torch.utils.data.Dataset):
         self.dataset = []
 
         for i, question in tqdm(enumerate(questions), desc="preparing data ..."):
-            question_tokens = self.tokenizer.encode(questions[i], max_length=MAX_LEN, padding=True, truncation=True)
-            answer_tokens = self.tokenizer.encode(answers[i], max_length=MAX_LEN, padding=True, truncation=True)
+            question_tokens = self.tokenizer.encode(questions[i], max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
+            answer_tokens = self.tokenizer.encode(answers[i], max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
 
             self.dataset.append((question_tokens, answer_tokens, labels[i]))
 
