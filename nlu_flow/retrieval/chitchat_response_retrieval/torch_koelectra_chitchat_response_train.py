@@ -117,7 +117,7 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
             optimizer.step()
 
             progress.set_description(
-                    f"training model, epoch:{epoch}, iter: {global_step}, loss:{loss.cpu().item()}, pos_loss:{pos_loss.cpu().item()}, neg_loss:{neg_loss.cpu().item()}"
+                    f"training model, epoch:{epoch}, iter: {global_step}, loss:{loss.cpu().item()}, pos_loss:{pos_loss.cpu().item()}, neg_loss:{neg_loss.cpu().item()}\n"
             )
             writer.add_scalar("train/loss", loss.cpu().item(), global_step)
             writer.add_scalar("train/pos_loss", pos_loss.cpu().item(), global_step)
