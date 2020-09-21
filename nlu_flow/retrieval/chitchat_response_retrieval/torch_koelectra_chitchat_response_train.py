@@ -38,8 +38,8 @@ class ChatbotKorpusDataset(torch.utils.data.Dataset):
         self.dataset = []
 
         for i, question in tqdm(enumerate(questions), desc="preparing data ..."):
-            question_tokens = self.tokenizer.encode(questions[i], max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
-            answer_tokens = self.tokenizer.encode(answers[i], max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
+            question_tokens = self.tokenizer.encode(questions[i], max_length=MAX_LEN, padding=True, truncation=True)
+            answer_tokens = self.tokenizer.encode(answers[i], max_length=MAX_LEN, padding=True, truncation=True)
 
             self.dataset.append((question_tokens, answer_tokens, labels[i]))
 
@@ -119,7 +119,6 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
                     f"training model, epoch:{epoch}, iter: {global_step}, loss:{loss.cpu().item()}"
             )
             writer.add_scalar("train/loss", loss.cpu().item(), global_step)
-            writer.add_scalar("train/lr", scheduler.get_last_lr(), global_step)
             global_step += 1
 
         torch.save(model.state_dict(), "transformer_chitchat_retrieval_model.modeldict")
