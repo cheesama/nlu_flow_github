@@ -119,7 +119,7 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
                     f"training model, epoch:{epoch}, iter: {global_step}, loss:{loss.cpu().item()}"
             )
             writer.add_scalar("train/loss", loss.cpu().item(), global_step)
-            writer.add_scalar("train/lr", scheduler.get_lr(), global_step)
+            writer.add_scalar("train/lr", scheduler.get_last_lr(), global_step)
             global_step += 1
 
         torch.save(model.state_dict(), "transformer_chitchat_retrieval_model.modeldict")
