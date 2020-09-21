@@ -86,6 +86,10 @@ model.train()
 if torch.cuda.is_available():
     model = model.cuda()
 
+# optimizer definition
+optimizer = Adam(model.parameters(), lr=float(lr))
+scheduler = lr_scheduler.StepLR(optimizer, 1.0, gamma=0.9)
+
 def train_model(n_epochs=30, lr=0.0001, batch_size=128):
     train_loader = DataLoader(
         train_dataset,
@@ -93,13 +97,10 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
         num_workers=multiprocessing.cpu_count(),
     )
 
-    # train model
-    optimizer = Adam(model.parameters(), lr=float(lr))
-    scheduler = lr_scheduler.StepLR(optimizer, 1.0, gamma=0.9)
-
     writer = SummaryWriter(log_dir=f"runs/epochs:{n_epochs}_lr:{lr}")
     global_step = 0
 
+    #train model
     for epoch in range(1, int(n_epochs) + 1):
         progress = tqdm(enumerate(train_loader), leave=False)
         for batch_idx, (question, answer, label) in progress:
@@ -115,11 +116,10 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
             optimizer.step()
 
             progress.set_description(
-                    f"training model, epoch:{epoch}, iter: {global_step}, loss:{loss.cpu().item()}, pos_loss:{pos_loss.cpu().item()}, neg_loss:{neg_loss.cpu().item()}"
+                    f"training model, epoch:{epoch}, iter: {global_step}, loss:{loss.cpu().item()}"
             )
             writer.add_scalar("train/loss", loss.cpu().item(), global_step)
-            writer.add_scalar("train/pos_loss", pos_loss.cpu().item(), global_step)
-            writer.add_scalar("train/neg_loss", neg_loss.cpu().item(), global_step)
+            writer.add_scalar("train/lr", scheduler.get_lr(), global_step)
             global_step += 1
 
         torch.save(model.state_dict(), "transformer_chitchat_retrieval_model.modeldict")

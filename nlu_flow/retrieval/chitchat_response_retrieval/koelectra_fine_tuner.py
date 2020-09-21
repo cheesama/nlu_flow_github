@@ -8,7 +8,8 @@ class KoelectraQAFineTuner(nn.Module):
     def __init__(
         self,
         max_len=64,
-        feature_dim=128
+        feature_dim=128,
+        margin=0.5
     ):
         super(KoelectraQAFineTuner, self).__init__()
 
@@ -23,6 +24,8 @@ class KoelectraQAFineTuner(nn.Module):
         self.answer_feature.bias.data.zero_()
         nn.init.xavier_uniform_(self.answer_feature.weight)
 
+        self.margin = margin
+
     def forward(self, q, a, label):
         question_features = self.get_question_feature(q)
         answer_features = self.get_answer_feature(a)
@@ -35,11 +38,11 @@ class KoelectraQAFineTuner(nn.Module):
 
         #ignore negative similarity of negative pair
         #neg_loss = (neg_pair * sim_value).clamp(min=0.0).mean()
-        neg_loss = (1 + (neg_pair * sim_value)).mean()
-        pos_loss = (1 - (pos_pair * sim_value)).mean()
+        neg_loss = F.relu((self.margin + (neg_pair * sim_value)) * 0.5)
+        pos_loss = (1 - (pos_pair * sim_value)) * 0.5
         loss = neg_loss + pos_loss
 
-        return loss, pos_loss, neg_loss
+        return loss.mean()
 
     def get_question_feature(self, q):
         question_features = F.normalize(self.question_feature(self.question_net(q)[0].mean(2)), dim=1)
