@@ -33,14 +33,9 @@ class KoelectraQAFineTuner(nn.Module):
         sim_value = torch.mm(question_features, answer_features.transpose(1,0))
 
         label = label.unsqueeze(1)
-        pos_pair = (label == label.transpose(1,0)).float()
-        neg_pair = (label != label.transpose(1,0)).float()
+        pair_info = (label == label.transpose(1,0)).float()
 
-        #ignore negative similarity of negative pair
-        #neg_loss = (neg_pair * sim_value).clamp(min=0.0).mean()
-        neg_loss = F.relu((self.margin + (neg_pair * sim_value)) * 0.5)
-        pos_loss = (1 - (pos_pair * sim_value)) * 0.5
-        loss = neg_loss + pos_loss
+        loss = (((1 - pair_info) * F.relu(self.margin + sim_value)) + (1 - (pair_info * sim_value))) * 0.5
 
         return loss.mean()
 
