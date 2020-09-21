@@ -80,6 +80,12 @@ for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...')
 
 train_dataset = ChatbotKorpusDataset(questions, answers, tokenizer)
 
+# model definition
+model = KoelectraQAFineTuner(max_len=MAX_LEN)
+model.train()
+if torch.cuda.is_available():
+    model = model.cuda()
+
 def train_model(n_epochs=30, lr=0.0001, batch_size=128):
     train_loader = DataLoader(
         train_dataset,
@@ -87,22 +93,14 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
         num_workers=multiprocessing.cpu_count(),
     )
 
-    # model definition
-    model = KoelectraQAFineTuner(max_len=MAX_LEN)
-
-    if torch.cuda.is_available():
-        model = model.cuda()
-
     # train model
     optimizer = Adam(model.parameters(), lr=float(lr))
-    scheduler = lr_scheduler.StepLR(optimizer, 1.0, gamma=0.95)
+    scheduler = lr_scheduler.StepLR(optimizer, 1.0, gamma=0.9)
 
     writer = SummaryWriter(log_dir=f"runs/epochs:{n_epochs}_lr:{lr}")
     global_step = 0
 
     for epoch in range(1, int(n_epochs) + 1):
-        model.train()
-
         progress = tqdm(enumerate(train_loader), leave=False)
         for batch_idx, (question, answer, label) in progress:
             if torch.cuda.is_available():
@@ -113,7 +111,7 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
             optimizer.zero_grad()
             loss, pos_loss, neg_loss = model(question, answer, label)
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
+            #torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
 
             progress.set_description(
