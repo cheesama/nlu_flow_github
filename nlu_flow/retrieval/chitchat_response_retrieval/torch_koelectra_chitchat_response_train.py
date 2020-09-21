@@ -110,7 +110,7 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
                 label = label.cuda()
 
             optimizer.zero_grad()
-            loss, pos_loss, neg_loss = model(question, answer, label)
+            loss = model(question, answer, label)
             loss.backward()
             #torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
