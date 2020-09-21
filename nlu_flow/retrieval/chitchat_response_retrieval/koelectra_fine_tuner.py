@@ -17,11 +17,9 @@ class KoelectraQAFineTuner(nn.Module):
         self.answer_net = ElectraModel.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
         self.question_feature = nn.Linear(max_len, feature_dim)
-        self.question_feature.bias.data.zero_()
         nn.init.xavier_uniform_(self.question_feature.weight)
 
         self.answer_feature = nn.Linear(max_len, feature_dim)
-        self.answer_feature.bias.data.zero_()
         nn.init.xavier_uniform_(self.answer_feature.weight)
 
         self.margin = margin
@@ -35,7 +33,7 @@ class KoelectraQAFineTuner(nn.Module):
         label = label.unsqueeze(1)
         pair_info = (label == label.transpose(1,0)).float()
 
-        loss = (((1 - pair_info) * F.relu(self.margin + sim_value)) + (1 - (pair_info * sim_value))) * 0.5
+        loss = ((1 - pair_info) * F.relu(self.margin + sim_value)) * 0.5 + (1 - (pair_info * sim_value))
 
         return loss.mean()
 

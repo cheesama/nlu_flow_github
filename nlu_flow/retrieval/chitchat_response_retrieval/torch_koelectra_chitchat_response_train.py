@@ -65,8 +65,9 @@ for response in tqdm(meta_responses, desc='meta db chitchat questions & response
 
     if response['class_name']['classes'] not in chitchat_class_dict:
         chitchat_class_dict[response['class_name']['classes']] = (len(labels), [])
-    chitchat_class_dict[response['class_name']['classes']][1].append(response['response'])
+        labels.append(len(labels))
 
+    chitchat_class_dict[response['class_name']['classes']][1].append(response['response'])
 
 meta_questions = meta_db_client.get('nlu-chitchat-utterances')
 for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...'):
@@ -112,7 +113,7 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
             optimizer.zero_grad()
             loss = model(question, answer, label)
             loss.backward()
-            #torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
 
             progress.set_description(
@@ -121,14 +122,14 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
             writer.add_scalar("train/loss", loss.cpu().item(), global_step)
             global_step += 1
 
-        torch.save(model.state_dict(), "transformer_chitchat_retrieval_model.modeldict")
+        torch.save(model.state_dict(), "koelectra_chitchat_retrieval_model.modeldict")
         scheduler.step()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--n_epochs", default=20)
-    parser.add_argument("--lr", default=0.0001)
+    parser.add_argument("--n_epochs", default=30)
+    parser.add_argument("--lr", default=1e-5)
     args = parser.parse_args()
 
     train_model(int(args.n_epochs), float(args.lr))
