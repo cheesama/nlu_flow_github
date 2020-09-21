@@ -86,16 +86,16 @@ model.train()
 if torch.cuda.is_available():
     model = model.cuda()
 
-# optimizer definition
-optimizer = Adam(model.parameters(), lr=float(lr))
-scheduler = lr_scheduler.StepLR(optimizer, 1.0, gamma=0.9)
-
 def train_model(n_epochs=30, lr=0.0001, batch_size=128):
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
         num_workers=multiprocessing.cpu_count(),
     )
+
+    # optimizer definition
+    optimizer = Adam(model.parameters(), lr=float(lr))
+    scheduler = lr_scheduler.StepLR(optimizer, 1.0, gamma=0.9)
 
     writer = SummaryWriter(log_dir=f"runs/epochs:{n_epochs}_lr:{lr}")
     global_step = 0
