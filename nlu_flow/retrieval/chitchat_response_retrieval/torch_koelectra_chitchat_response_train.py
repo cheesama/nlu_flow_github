@@ -81,12 +81,6 @@ for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...')
 
 train_dataset = ChatbotKorpusDataset(questions, answers, tokenizer)
 
-# model definition
-model = KoelectraQAFineTuner(max_len=MAX_LEN)
-model.train()
-if torch.cuda.is_available():
-    model = model.cuda()
-
 def train_model(n_epochs=30, lr=0.0001, batch_size=128):
     train_loader = DataLoader(
         train_dataset,
@@ -94,9 +88,16 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
         num_workers=multiprocessing.cpu_count(),
     )
 
+    # model definition
+    model = KoelectraQAFineTuner()
+    model.train()
+    if torch.cuda.is_available():
+        model = model.cuda()
+
     # optimizer definition
     optimizer = Adam(model.parameters(), lr=float(lr))
     scheduler = lr_scheduler.StepLR(optimizer, 1.0, gamma=0.9)
+    loss_fn = nn.CosineEmbeddingLoss()
 
     writer = SummaryWriter(log_dir=f"runs/epochs:{n_epochs}_lr:{lr}")
     global_step = 0
@@ -111,7 +112,10 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
                 label = label.cuda()
 
             optimizer.zero_grad()
-            loss = model(question, answer, label)
+
+            question_features, answer_features, label = model(question, answer, label)
+
+            loss = loss_fn(question_features, answer_features, label)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
@@ -129,7 +133,7 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_epochs", default=30)
-    parser.add_argument("--lr", default=1e-5)
+    parser.add_argument("--lr", default=5e-5)
     args = parser.parse_args()
 
     train_model(int(args.n_epochs), float(args.lr))
