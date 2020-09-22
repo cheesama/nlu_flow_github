@@ -138,12 +138,14 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
         scheduler.step()
 
 def build_index():
+    model = model.cpu()
     model.eval()
     index = faiss.IndexFlatL2(model.answer_net.config.hidden_size)   # build the index
 
     for answer in tqdm(answers, desc='building retrieval index ...'):
-        tokens = tokenizer.encode(answers, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
-        index.add(torch.tensor(tokens).cpu().numpy())
+        tokens = tokenizer.encode(answer, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
+        feature = model.get_answer_feature(torch.tensor(tokens).unsqueeze(0))
+        index.add(feature.numpy())
 
     faiss.write_index(index, 'chitchat_retrieval_index')
 
