@@ -134,7 +134,7 @@ def build_index():
     model.eval()
     index = faiss.IndexFlatL2(model.answer_net.config.hidden_size)   # build the index
 
-    for i, answer in tqdm(answers, desc='building retrieval index ...'):
+    for answer in tqdm(answers, desc='building retrieval index ...'):
         tokens = tokenizer.encode(answers, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
         index.add(torch.tensor(tokens).unsqueeze(0))
 
