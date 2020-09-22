@@ -24,7 +24,7 @@ class KoelectraQAFineTuner(nn.Module):
 
         self.margin = margin
 
-    def forward(self, q, a, label):
+    def forward(self, q, a):
         question_features = self.get_question_feature(q)
         answer_features = self.get_answer_feature(a)
 
@@ -33,14 +33,14 @@ class KoelectraQAFineTuner(nn.Module):
         label = label.unsqueeze(1)
         pair_info = (label == label.transpose(1,0)).float()
 
-        loss = ((1 - pair_info) * F.relu(self.margin + sim_value)) * 0.5 + (1 - (pair_info * sim_value))
+        loss = self.margin + ((1 - pair_info) * F.relu(self.margin + sim_value) + (-1.0 * pair_info * sim_value)) * 0.5
 
         return loss.mean()
 
     def get_question_feature(self, q):
-        question_features = F.normalize(self.question_feature(self.question_net(q)[0].mean(2)), dim=1)
+        question_features = F.normalize(self.question_feature(self.question_net(q)[0][:,0,:]), dim=1)
         return question_features
 
     def get_answer_feature(self, a):
-        answer_features = F.normalize(self.answer_feature(self.answer_net(a)[0].mean(2)), dim=1)
+        answer_features = F.normalize(self.answer_feature(self.answer_net(a)[0][:,0,:]), dim=1)
         return answer_features
