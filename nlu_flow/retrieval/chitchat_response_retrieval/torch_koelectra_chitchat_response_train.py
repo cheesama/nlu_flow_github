@@ -17,6 +17,7 @@ import os, sys
 import multiprocessing
 import argparse
 import random
+import faiss
 
 MAX_LEN = 64
 
@@ -81,18 +82,18 @@ for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...')
 
 train_dataset = ChatbotKorpusDataset(questions, answers, tokenizer)
 
+# model definition
+model = KoelectraQAFineTuner()
+model.train()
+if torch.cuda.is_available():
+    model = model.cuda()
+
 def train_model(n_epochs=30, lr=0.0001, batch_size=128):
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
         num_workers=multiprocessing.cpu_count(),
     )
-
-    # model definition
-    model = KoelectraQAFineTuner()
-    model.train()
-    if torch.cuda.is_available():
-        model = model.cuda()
 
     # optimizer definition
     optimizer = Adam(model.parameters(), lr=float(lr))
@@ -129,11 +130,21 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
         torch.save(model.state_dict(), "koelectra_chitchat_retrieval_model.modeldict")
         scheduler.step()
 
+def build_index():
+    model.eval()
+    index = faiss.IndexFlatL2(model.answer_net.config.hidden_size)   # build the index
+
+    for i, answer in tqdm(answers, desc='building retrieval index ...'):
+        tokens = tokenizer.encode(answers, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
+        index.add(torch.tensor(tokens).unsqueeze(0))
+
+    faiss.write_index(index, 'chitchat_retrieval_index')
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--n_epochs", default=30)
+    parser.add_argument("--n_epochs", default=20)
     parser.add_argument("--lr", default=5e-5)
     args = parser.parse_args()
 
     train_model(int(args.n_epochs), float(args.lr))
+    build_index()
