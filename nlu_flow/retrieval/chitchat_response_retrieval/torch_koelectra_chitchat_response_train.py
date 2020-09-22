@@ -114,9 +114,12 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
 
             optimizer.zero_grad()
 
-            question_features, answer_features, label = model(question, answer, label)
+            question_features, answer_features = model(question, answer)
 
-            loss = loss_fn(question_features, answer_features, label)
+            pos_loss = loss_fn(question_features, answer_features, (label==label).float())
+            mixed_loss =  loss_fn(question_features[1:], answer_features[:-1], (label[1:]==label[:-1]).float())
+            loss = pos_loss + mixed_loss
+
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
@@ -136,7 +139,7 @@ def build_index():
 
     for answer in tqdm(answers, desc='building retrieval index ...'):
         tokens = tokenizer.encode(answers, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
-        index.add(torch.tensor(tokens).unsqueeze(0))
+        index.add(torch.tensor(tokens).cpu().unsqueeze(0).numpy())
 
     faiss.write_index(index, 'chitchat_retrieval_index')
 
