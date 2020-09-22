@@ -143,7 +143,7 @@ def build_index():
 
     for answer in tqdm(answers, desc='building retrieval index ...'):
         tokens = tokenizer.encode(answers, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
-        index.add(torch.tensor(tokens).cpu().unsqueeze(0).numpy())
+        index.add(torch.tensor(tokens).cpu().numpy())
 
     faiss.write_index(index, 'chitchat_retrieval_index')
 
