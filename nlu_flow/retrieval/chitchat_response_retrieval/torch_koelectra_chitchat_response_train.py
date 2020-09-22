@@ -116,10 +116,14 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
 
             question_features, answer_features = model(question, answer)
 
-            pos_loss = loss_fn(question_features, answer_features, (label==label).float())
-            mixed_loss =  loss_fn(question_features[1:], answer_features[:-1], (label[1:]==label[:-1]).float())
-            loss = pos_loss + mixed_loss
+            #in-batch constrastive learning
+            question_features = question_features.repeat(answer.size(0), 1)
+            answer_features = answer_features.unsqueeze(0).repeat(1, question.size(0),1).squeeze(0)
+            label = label.unsqueeze(1)
+            label1 = label.repeat(answer.size(0), 1)
+            label2 = label.unsqueeze(0).repeat(1, question.size(0),1).squeeze(0)
 
+            loss = loss_fn(question_features, answer_features, (label1==label2).float())
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
@@ -127,7 +131,7 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
             progress.set_description(
                     f"training model, epoch:{epoch}, iter: {global_step}, loss:{loss.cpu().item()}"
             )
-            writer.add_scalar("train/loss", loss.cpu().item(), global_step)
+            writer.add_scalar("train/loss", loss.cpu().item().numpy(), global_step)
             global_step += 1
 
         torch.save(model.state_dict(), "koelectra_chitchat_retrieval_model.modeldict")
