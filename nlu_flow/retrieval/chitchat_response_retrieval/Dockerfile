@@ -1,4 +1,4 @@
-FROM python:3.8-slim
+FROM python:3.7-slim
 
 USER root
 
@@ -13,8 +13,9 @@ RUN buildDeps='gcc libc6-dev make libomp-dev' \
     && apt-get purge -y --auto-remove $buildDeps
 
 WORKDIR /workspace/
-COPY embedding_transformer.py /workspace/embedding_transformer.py
-COPY transformer_chitchat_response_model.modeldict /workspace/transformer_chitchat_response_model.modeldict
+COPY koelectra_fine_tuner.py /workspace/koelectra_fine_tuner.py
+COPY koelectra_chitchat_retrieval_model.modeldict /workspace/koelectra_chitchat_retrieval_model.modeldict
+COPY chitchat_retrieval_index /workspace/chitchat_retrieval_index
 COPY inferencer.py /workspace/inferencer.py
 
 EXPOSE  8000
