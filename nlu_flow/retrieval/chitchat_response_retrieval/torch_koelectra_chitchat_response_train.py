@@ -88,7 +88,7 @@ model.train()
 if torch.cuda.is_available():
     model = model.cuda()
 
-def train_model(n_epochs=30, lr=0.0001, batch_size=128):
+def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
@@ -137,7 +137,7 @@ def train_model(n_epochs=30, lr=0.0001, batch_size=128):
         torch.save(model.state_dict(), "koelectra_chitchat_retrieval_model.modeldict")
         scheduler.step()
 
-def build_index():
+    #build_index
     model = model.cpu()
     model.eval()
     index = faiss.IndexFlatL2(model.answer_net.config.hidden_size)   # build the index
@@ -156,4 +156,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     train_model(int(args.n_epochs), float(args.lr))
-    build_index()
