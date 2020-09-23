@@ -82,18 +82,18 @@ for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...')
 
 train_dataset = ChatbotKorpusDataset(questions, answers, tokenizer)
 
-# model definition
-model = KoelectraQAFineTuner()
-model.train()
-if torch.cuda.is_available():
-    model = model.cuda()
-
 def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
         num_workers=multiprocessing.cpu_count(),
     )
+
+    # model definition
+    model = KoelectraQAFineTuner()
+    model.train()
+    if torch.cuda.is_available():
+        model = model.cuda()
 
     # optimizer definition
     optimizer = Adam(model.parameters(), lr=float(lr))
