@@ -1,9 +1,7 @@
 korpora
-
 transformers
 torch
-
-faiss
-
+faiss==1.5.3
 fastapi
 requests
+dill
