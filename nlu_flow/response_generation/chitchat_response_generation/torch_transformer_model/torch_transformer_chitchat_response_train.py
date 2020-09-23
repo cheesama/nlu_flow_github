@@ -5,6 +5,7 @@ from embedding_transformer import EmbeddingTransformer
 
 from nlu_flow.preprocessor.text_preprocessor import normalize
 from nlu_flow.utils.kor_char_tokenizer import KorCharTokenizer
+from nlu_flow.utils import meta_db_client
 
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
@@ -16,6 +17,7 @@ import torch.nn as nn
 import os, sys
 import multiprocessing
 import argparse
+import random
 
 # downlad dataset
 chatbot_corpus = KoreanChatbotKorpus()
@@ -61,9 +63,30 @@ class ChatbotKorpusDataset(torch.utils.data.Dataset):
 questions = []
 answers = []
 
+# korpora dataset add
 for qa in chatbot_corpus.train:
     questions.append(qa.text)
     answers.append(qa.pair)
+
+# meta db dataset add
+chitchat_class_dict = dict()
+
+meta_responses = meta_db_client.get('nlu-chitchat-responses')
+for response in tqdm(meta_responses, desc='meta db chitchat questions & response organizing ...'):
+    if response['class_name'] is None:
+        continue
+
+    if response['class_name']['classes'] not in chitchat_class_dict:
+        chitchat_class_dict[response['class_name']['classes']] = []
+    chitchat_class_dict[response['class_name']['classes']].append(response['response'])
+
+meta_questions = meta_db_client.get('nlu-chitchat-utterances')
+for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...'):
+    if question['class_name'] is None:
+        continue
+
+    questions.append(question['utterance'])
+    answers.append(random.choice(chitchat_class_dict[question['class_name']['classes']]))
 
 train_dataset = ChatbotKorpusDataset(questions, answers, tokenizer, padding=False)
 

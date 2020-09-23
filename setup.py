@@ -11,7 +11,7 @@ setup(
     author="Cheesama",
     install_requires=[required],
     packages=find_packages(exclude=["docs", "tests", "tmp", "data"]),
-    python_requires=">=3.8",
+    python_requires=">=3.7",
     zip_safe=False,
     include_package_data=True,
 )

@@ -20,6 +20,7 @@ model = EmbeddingTransformer(
     pad_token_id=tokenizer.get_pad_token_id(),
 )
 model.load_state_dict(torch.load('transformer_chitchat_response_model.modeldict',  map_location=lambda storage, loc: storage))
+model.eval()
 
 if model is not None:
     is_ready = True
@@ -39,21 +40,24 @@ async def health():
 @app.post("/chitchat_response_generator/generate")
 async def generate_response(text: str):
     max_len = model.max_seq_len
-    tokens = tokenizer.tokenize(text)
+    tokens = tokenizer.tokenize(text, padding=False)
+    origin_token_length = len(tokens)
 
     while True:
+        print (f'token: {tokens}')
         pred = model(torch.LongTensor(tokens).unsqueeze(0))
         pred = pred.argmax(2)[0].numpy()
+        print (f'pred: {pred}')
 
         if len(tokens) >= tokenizer.max_len:
             break
 
-        if pred[len(tokens) + 1] == 1: #1 means EOS token
+        if pred[-1] == 1: #1 means EOS token
             break
 
-        tokens += pred[len(tokens)]
+        tokens += [pred[-1]]
 
-    response = tokenizer.decode(pred)
+    response = tokenizer.decode(tokens[origin_token_length:])
 
     return {
         "response": response,
