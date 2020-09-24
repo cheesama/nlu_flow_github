@@ -14,14 +14,14 @@ is_ready = False
 #load chitchat_retrieval_model
 model = None
 model = KoelectraQAFineTuner()
-model.load_state_dict(torch.load('./koelectra_chitchat_retrieval_model.modeldict', map_location=lambda storage, location: 'cpu'))
+model.load_state_dict(torch.load('./koelectra_chitchat_retrieval_model.modeldict', map_location=lambda storage, loc: storage))
 
 #load tokenizer
 MAX_LEN = 64
 tokenizer = ElectraTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
 #load index
-index = faiss.read_indx('chitchat_retrieval_index')
+index = faiss.read_index('chitchat_retrieval_index')
 top_k = 1
 
 #load response_dict

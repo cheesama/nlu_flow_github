@@ -153,7 +153,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
 
     faiss.write_index(index, 'chitchat_retrieval_index')
 
-    with open('response_dict', 'wb') as responseFile:
+    with open('response_dict.dill', 'wb') as responseFile:
         dill.dump(response_dict, responseFile)
 
 if __name__ == "__main__":
