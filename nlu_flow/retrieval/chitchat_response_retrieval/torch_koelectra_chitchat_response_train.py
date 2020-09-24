@@ -18,6 +18,7 @@ import multiprocessing
 import argparse
 import random
 import faiss
+import dill
 
 MAX_LEN = 64
 
