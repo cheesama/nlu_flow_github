@@ -24,14 +24,20 @@ import dill
 
 MAX_LEN = 64
 
-# downlad dataset
-chatbot_corpus = KoreanChatbotKorpus()
-
 tokenizer = ElectraTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
 questions = []
 answers = []
 labels = []
+
+# downlad kopora dataset
+'''
+chatbot_corpus = KoreanChatbotKorpus()
+for i, qa in enumerate(chatbot_corpus.train):
+    questions.append(qa.text)
+    answers.append(qa.pair)
+    labels.append(i)
+'''
 
 # prepare torch dataset
 class ChatbotKorpusDataset(torch.utils.data.Dataset):
@@ -52,12 +58,6 @@ class ChatbotKorpusDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         return torch.tensor(self.dataset[idx][0]), torch.tensor(self.dataset[idx][1]), torch.tensor(self.dataset[idx][2])
-
-# korpora dataset add
-for i, qa in enumerate(chatbot_corpus.train):
-    questions.append(qa.text)
-    answers.append(qa.pair)
-    labels.append(i)
     
 # meta db dataset add
 chitchat_class_dict = dict()
