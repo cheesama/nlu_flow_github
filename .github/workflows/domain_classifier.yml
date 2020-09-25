@@ -12,6 +12,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         run: |
+            apt-get update
             apt-get install python3-dev
             pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements_model.txt
             python setup.py install

@@ -12,7 +12,8 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         run: |
-            apt-get install wget git
+            apt-get update
+            apt-get install -y python3-dev
             pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements_model.txt
             python setup.py install
             cd nlu_flow/sentence_classification/chitchat_classifier && pip install -r requirements.txt && python sklearn_chitchat_classifier.py && cp * ../../../
