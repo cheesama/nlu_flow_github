@@ -28,30 +28,13 @@ answers = []
 labels = []
 
 # downlad kopora dataset
+'''
 chatbot_corpus = KoreanChatbotKorpus()
 for i, qa in enumerate(chatbot_corpus.train):
     questions.append(qa.text)
     answers.append(qa.pair)
     labels.append(i)
-
-# prepare torch dataset
-class ChatbotKorpusDataset(torch.utils.data.Dataset):
-    def __init__(self, questions, tokenizer):
-
-        self.tokenizer = tokenizer
-        self.dataset = []
-
-        for i, question in tqdm(enumerate(questions), desc="preparing data ..."):
-            question_tokens = self.tokenizer.encode(questions[i], max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
-
-            self.dataset.append((question_tokens, labels[i]))
-
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, idx):
-        return torch.tensor(self.dataset[idx][0]), torch.tensor(self.dataset[idx][1])
-    
+'''
 # meta db dataset add
 chitchat_class_dict = dict()
 
@@ -75,6 +58,24 @@ for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...')
     answers.append(random.choice(chitchat_class_dict[response['class_name']['classes']][1]))
     labels.append(chitchat_class_dict[question['class_name']['classes']][0])
 
+# prepare torch dataset
+class ChatbotKorpusDataset(torch.utils.data.Dataset):
+    def __init__(self, questions, tokenizer):
+
+        self.tokenizer = tokenizer
+        self.dataset = []
+
+        for i, question in tqdm(enumerate(questions), desc="preparing data ..."):
+            question_tokens = self.tokenizer.encode(questions[i], max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
+
+            self.dataset.append((question_tokens, labels[i]))
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        return torch.tensor(self.dataset[idx][0]), torch.tensor(self.dataset[idx][1])
+    
 train_dataset = ChatbotKorpusDataset(questions, tokenizer)
 
 def train_model(n_epochs=20, lr=0.0001, batch_size=128):
