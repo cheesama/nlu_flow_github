@@ -1,0 +1,7 @@
+korpora
+transformers
+torch
+uvicorn
+fastapi
+requests
+dill
