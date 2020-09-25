@@ -6,7 +6,6 @@ from koelectra_fine_tuner import KoelectraQAFineTuner
 
 import torch.nn.functional as F
 import torch
-import faiss
 import dill
 
 app = FastAPI()
@@ -17,9 +16,6 @@ response_dict = {}
 with open('./response_dict.dill', 'rb') as responsefile:
     response_dict = dill.load(responsefile)
 
-if model:
-    is_ready = true
-
 #load chitchat_retrieval_model
 model = None
 model = KoelectraQAFineTuner(class_num=len(response_dict))
@@ -29,6 +25,9 @@ model.eval()
 #load tokenizer
 MAX_LEN = 64
 tokenizer = ElectraTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
+
+if model:
+    is_ready = true
 
 #endpoints
 @app.get("/")

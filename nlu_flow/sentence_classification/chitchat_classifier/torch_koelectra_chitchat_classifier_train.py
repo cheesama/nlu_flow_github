@@ -45,7 +45,6 @@ for response in tqdm(meta_responses, desc='meta db chitchat questions & response
 
     if response['class_name']['classes'] not in chitchat_class_dict:
         chitchat_class_dict[response['class_name']['classes']] = (len(labels), [])
-        labels.append(len(labels))
 
     chitchat_class_dict[response['class_name']['classes']][1].append(response['response'])
 
@@ -112,7 +111,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
             question_features = model(question)
             loss = loss_fn(question_features, label)
             loss.backward()
-            #torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
 
             progress.set_description(
