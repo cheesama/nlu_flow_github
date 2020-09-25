@@ -130,7 +130,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     model.eval()
 
     response_dict = {}
-    response_dict['label_num'] = label_num - 1
+    response_dict['label_num'] = len(chitchat_class_dict)
 
     with torch.no_grad():
         for i, answer in enumerate(tqdm(answers, desc='building retrieval index ...')):
