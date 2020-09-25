@@ -166,4 +166,4 @@ if __name__ == "__main__":
     parser.add_argument("--batch_size", default=128)
     args = parser.parse_args()
 
-    train_model(int(args.n_epochs), float(args.lr), args.batch_size)
+    train_model(int(args.n_epochs), float(args.lr), int(args.batch_size))
