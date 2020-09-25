@@ -18,7 +18,7 @@ with open('./response_dict.dill', 'rb') as responsefile:
 
 #load chitchat_retrieval_model
 model = None
-model = KoelectraQAFineTuner(class_num=len(response_dict))
+model = KoelectraQAFineTuner(class_num=response_dict['label_num'])
 model.load_state_dict(torch.load('./koelectra_chitchat_classifier_model.modeldict', map_location=lambda storage, loc: storage))
 model.eval()
 

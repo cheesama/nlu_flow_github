@@ -37,6 +37,7 @@ for i, qa in enumerate(chatbot_corpus.train):
 '''
 # meta db dataset add
 chitchat_class_dict = dict()
+label_num = 0
 
 meta_responses = meta_db_client.get('nlu-chitchat-responses')
 for response in tqdm(meta_responses, desc='meta db chitchat questions & response organizing ...'):
@@ -44,7 +45,8 @@ for response in tqdm(meta_responses, desc='meta db chitchat questions & response
         continue
 
     if response['class_name']['classes'] not in chitchat_class_dict:
-        chitchat_class_dict[response['class_name']['classes']] = (len(labels), [])
+        chitchat_class_dict[response['class_name']['classes']] = (label_num, [])
+        label_num += 1
 
     chitchat_class_dict[response['class_name']['classes']][1].append(response['response'])
 
@@ -128,6 +130,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     model.eval()
 
     response_dict = {}
+    response_dict['label_num'] = label_num
 
     with torch.no_grad():
         for i, answer in enumerate(tqdm(answers, desc='building retrieval index ...')):
