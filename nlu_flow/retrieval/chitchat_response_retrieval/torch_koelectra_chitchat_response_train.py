@@ -6,6 +6,8 @@ from koelectra_fine_tuner import KoelectraQAFineTuner
 
 from nlu_flow.utils import meta_db_client
 
+from faiss import normalize_L2
+
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torch.optim import Adam, lr_scheduler
@@ -141,7 +143,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     #build_index
     model = model.cpu()
     model.eval()
-    index = faiss.IndexFlatL2(model.answer_net.config.hidden_size)   # build the index
+    index = faiss.IndexFlatIP(model.answer_net.config.hidden_size)   # build the index
 
     response_dict = {}
 

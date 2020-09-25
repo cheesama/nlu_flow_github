@@ -7,7 +7,7 @@ RUN buildDeps='gcc libc6-dev make libomp-dev' \
     && apt-get update && apt-get install -y $buildDeps git wget tar \
     && pip install --upgrade pip \
     && pip install -r req.txt \
-    && pip install faiss-cpu --no-cache \
+    && pip install faiss --no-cache \
     && pip install git+http://github.com/cheesama/nlu_flow.git \
     && pip install git+http://github.com/cheesama/soynlp.git \
     && rm -rf /var/lib/apt/lists/* \

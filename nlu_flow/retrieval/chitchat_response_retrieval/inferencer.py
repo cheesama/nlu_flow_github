@@ -43,9 +43,10 @@ async def health():
 
 @app.post("/chitchat_retrieval/search")
 async def search_chitchat_answer(text: str):
-    tokens = tokenizer.encode(text, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
-    feature = model.get_question_feature(torch.tensor(tokens).unsqueeze(0))
-    distance, neighbour = index.search(feature,k = top_k)
+    with torch.no_grad():
+        tokens = tokenizer.encode(text, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
+        feature = model.get_question_feature(torch.tensor(tokens).unsqueeze(0))
+        distance, neighbour = index.search(feature,k = top_k)
 
-    return {'name': name, 'confidence': confidence, 'Classifier': 'domain_classifier_model.svc'}
+    return {'similarity': distance, 'response': response_dict[neighbour[0][0]], 'model': 'koelectra_chitchat_retrieval_model'}
 

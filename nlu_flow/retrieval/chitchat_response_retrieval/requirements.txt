@@ -1,7 +1,8 @@
 korpora
 transformers
 torch
-faiss==1.5.3
+uvicorn
 fastapi
 requests
 dill
+faiss
