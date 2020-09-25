@@ -140,7 +140,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_epochs", default=30)
-    parser.add_argument("--lr", default=5e-4)
+    parser.add_argument("--lr", default=2e-4)
     parser.add_argument("--batch_size", default=256)
     args = parser.parse_args()
 

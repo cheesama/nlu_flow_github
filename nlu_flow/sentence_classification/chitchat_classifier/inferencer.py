@@ -4,6 +4,7 @@ from transformers import ElectraModel, ElectraTokenizer
 
 from koelectra_fine_tuner import KoelectraQAFineTuner
 
+import torch.nn.functional as F
 import torch
 import faiss
 import dill
@@ -11,26 +12,23 @@ import dill
 app = FastAPI()
 is_ready = False
 
+#load response_dict
+response_dict = {}
+with open('./response_dict.dill', 'rb') as responsefile:
+    response_dict = dill.load(responsefile)
+
+if model:
+    is_ready = true
+
 #load chitchat_retrieval_model
 model = None
-model = KoelectraQAFineTuner()
-model.load_state_dict(torch.load('./koelectra_chitchat_retrieval_model.modeldict', map_location=lambda storage, loc: storage))
+model = KoelectraQAFineTuner(class_num=len(response_dict))
+model.load_state_dict(torch.load('./koelectra_chitchat_classifier_model.modeldict', map_location=lambda storage, loc: storage))
+model.eval()
 
 #load tokenizer
 MAX_LEN = 64
 tokenizer = ElectraTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
-
-#load index
-index = faiss.read_index('chitchat_retrieval_index')
-top_k = 1
-
-#load response_dict
-response_dict = {}
-with open('./response_dict.dill', 'rb') as responseFile:
-    response_dict = dill.load(responseFile)
-
-if model:
-    is_ready = True
 
 #endpoints
 @app.get("/")
@@ -41,12 +39,13 @@ async def health():
         output = {'code': 500}
     return output
 
-@app.post("/chitchat_retrieval/search")
-async def search_chitchat_answer(text: str):
+@app.post("/chitchat_classification/predict")
+async def chitchat_response_classification(text: str):
     with torch.no_grad():
         tokens = tokenizer.encode(text, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
-        feature = model.get_question_feature(torch.tensor(tokens).unsqueeze(0))
-        distance, neighbour = index.search(feature,k = top_k)
+        feature = model(torch.tensor(tokens).unsqueeze(0))
+        confidence = F.softmax(feature, dim=1).max()
+        pred_class = feature.argmax(1)
 
-    return {'similarity': distance, 'response': response_dict[neighbour[0][0]], 'model': 'koelectra_chitchat_retrieval_model'}
+    return {'confidence': confidence, 'response': response_dict[pred_class], 'model': 'koelectra_chitchat_classifier_model'}
 
