@@ -112,7 +112,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
             question_features = model(question)
             loss = loss_fn(question_features, label)
             loss.backward()
-            torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
+            #torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
 
             progress.set_description(
@@ -127,7 +127,6 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     #build_index
     model = model.cpu()
     model.eval()
-    index = faiss.IndexFlatIP(model.answer_net.config.hidden_size)   # build the index
 
     response_dict = {}
 
@@ -140,9 +139,9 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--n_epochs", default=20)
-    parser.add_argument("--lr", default=5e-5)
-    parser.add_argument("--batch_size", default=128)
+    parser.add_argument("--n_epochs", default=30)
+    parser.add_argument("--lr", default=5e-4)
+    parser.add_argument("--batch_size", default=256)
     args = parser.parse_args()
 
     train_model(int(args.n_epochs), float(args.lr), int(args.batch_size))
