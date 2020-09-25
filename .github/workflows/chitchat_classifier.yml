@@ -16,7 +16,7 @@ jobs:
             apt-get install -y python3-dev
             pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements_model.txt
             python setup.py install
-            cd nlu_flow/sentence_classification/chitchat_classifier && pip install -r requirements.txt && python sklearn_chitchat_classifier.py && cp * ../../../
+            cd nlu_flow/sentence_classification/chitchat_classifier/sklearn_svm && pip install -r requirements.txt && python sklearn_chitchat_classifier.py && cp * ../../../
             # Write your CML report
             cml-send-comment report.md
       - name: Push Docker image to GitHub Packages
