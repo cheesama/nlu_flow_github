@@ -38,6 +38,31 @@ for i, qa in enumerate(chatbot_corpus.train):
     answers.append(qa.pair)
     labels.append(i)
 '''
+# meta db dataset add
+chitchat_class_dict = dict()
+label_num = 0
+
+meta_responses = meta_db_client.get('nlu-chitchat-responses')
+for response in tqdm(meta_responses, desc='meta db chitchat questions & response organizing ...'):
+    if response['class_name'] is None:
+        continue
+
+    if response['class_name']['classes'] not in chitchat_class_dict:
+        chitchat_class_dict[response['class_name']['classes']] = (label_num, [])
+        label_num += 1
+
+    chitchat_class_dict[response['class_name']['classes']][1].append(response['response'])
+
+meta_questions = meta_db_client.get('nlu-chitchat-utterances')
+for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...'):
+    if question['class_name'] is None:
+        continue
+
+    for each_answer in chitchat_class_dict[question['class_name']['classes']][1]:
+        questions.append(question['utterance'])
+        answers.append(each_answer)
+        labels.append(chitchat_class_dict[question['class_name']['classes']][0])
+
 
 # prepare torch dataset
 class ChatbotKorpusDataset(torch.utils.data.Dataset):
@@ -59,30 +84,6 @@ class ChatbotKorpusDataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         return torch.tensor(self.dataset[idx][0]), torch.tensor(self.dataset[idx][1]), torch.tensor(self.dataset[idx][2])
     
-# meta db dataset add
-chitchat_class_dict = dict()
-
-meta_responses = meta_db_client.get('nlu-chitchat-responses')
-for response in tqdm(meta_responses, desc='meta db chitchat questions & response organizing ...'):
-    if response['class_name'] is None:
-        continue
-
-    if response['class_name']['classes'] not in chitchat_class_dict:
-        chitchat_class_dict[response['class_name']['classes']] = (len(labels), [])
-        labels.append(len(labels))
-
-    chitchat_class_dict[response['class_name']['classes']][1].append(response['response'])
-
-meta_questions = meta_db_client.get('nlu-chitchat-utterances')
-for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...'):
-    if question['class_name'] is None:
-        continue
-
-    for each_answer in chitchat_class_dict[question['class_name']['classes']][1]:
-        questions.append(question['utterance'])
-        answers.append(each_answer)
-        labels.append(chitchat_class_dict[question['class_name']['classes']][0])
-
 train_dataset = ChatbotKorpusDataset(questions, answers, tokenizer)
 
 def train_model(n_epochs=20, lr=0.0001, batch_size=128):
