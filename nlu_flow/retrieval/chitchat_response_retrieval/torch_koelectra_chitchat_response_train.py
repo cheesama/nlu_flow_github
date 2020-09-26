@@ -153,6 +153,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
             response_dict[i] = answer
             tokens = tokenizer.encode(answer, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
             feature = model.get_answer_feature(torch.tensor(tokens).unsqueeze(0))
+            index.train(feature.numpy())
             index.add(feature.numpy())
 
     faiss.write_index(index, 'chitchat_retrieval_index')
