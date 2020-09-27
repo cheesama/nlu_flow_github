@@ -31,11 +31,13 @@ answers = []
 labels = []
 
 # downlad kopora dataset
+'''
 chatbot_corpus = KoreanChatbotKorpus()
 for i, qa in enumerate(chatbot_corpus.train):
     questions.append(qa.text)
     answers.append(qa.pair)
     labels.append(i)
+'''
 
 # meta db dataset add
 chitchat_class_dict = dict()
