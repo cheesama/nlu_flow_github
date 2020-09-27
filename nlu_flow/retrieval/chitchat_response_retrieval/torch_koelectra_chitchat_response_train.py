@@ -101,7 +101,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     # optimizer definition
     optimizer = Adam(model.parameters(), lr=float(lr))
     scheduler = lr_scheduler.StepLR(optimizer, 1.0, gamma=0.9)
-    loss_fn = nn.CosineEmbeddingLoss()
+    loss_fn = nn.CosineEmbeddingLoss(margin=0.5)
 
     writer = SummaryWriter(log_dir=f"runs/epochs:{n_epochs}_lr:{lr}")
     global_step = 0
@@ -126,7 +126,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
             label1 = label.repeat(answer.size(0), 1)
             label2 = label.unsqueeze(0).repeat(1, question.size(0),1).squeeze(0)
 
-            loss = loss_fn(question_features, answer_features, (label1==label2).float())
+            loss = loss_fn(question_features, answer_features, (label1==label2).float() + ((label1!=label2).float() * -1))
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
