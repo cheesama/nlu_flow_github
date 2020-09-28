@@ -77,9 +77,9 @@ for data in tqdm(
         continue
 
     synonyms += [
-        normalize(each_synonym.get("synonym"))
+        normalize(each_synonym.get("synonym"), with_space=True)
         for each_synonym in data.get("meta_synonyms")
-    ] + [normalize(data.get("Entity_Value"))]
+    ] + [normalize(data.get("Entity_Value"), with_space=True)]
 
 
 meta_questions = meta_db_client.get("nlu-faq-questions")
@@ -91,9 +91,32 @@ for question in tqdm(meta_questions, desc="meta db faq dataset adding ..."):
             "buttons": question["buttons"],
         }
 
+    # check synonym is included
+    for synonym_list in synonyms:
+        if len(question) > len(meta_questions) * 10:
+            break
+
+        for i, prev_value in enumerate(synonym_list):
+            if prev_value in question['question']:
+                for j, post_value in enumerate(synonym_list):
+                    if i == j:
+                        continue
+
+                    try:
+                        q = normalize(question["question"], with_space=True)
+                        a = normalize(question["answer"], with_space=True)
+
+                        questions.append(q)
+                        answers.append(a)
+                        buttons.append(question["buttons"])
+                        labels.append(faq_class_dict[question["faq_intent"]]["label"])
+
+                    except:
+                        print(f"check data: {question}")
+
     try:
-        q = normalize(question["question"])
-        a = normalize(question["answer"])
+        q = normalize(question["question"], with_space=True)
+        a = normalize(question["answer"], with_space=True)
 
         questions.append(q)
         answers.append(a)
@@ -120,7 +143,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     # optimizer definition
     optimizer = Adam(model.parameters(), lr=float(lr))
     scheduler = lr_scheduler.StepLR(optimizer, 1.0, gamma=0.9)
-    loss_fn = nn.CosineEmbeddingLoss(reduction="sum")
+    loss_fn = nn.CosineEmbeddingLoss()#reduction="sum")
 
     writer = SummaryWriter(log_dir=f"runs/epochs:{n_epochs}_lr:{lr}")
     global_step = 0
@@ -174,7 +197,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     with torch.no_grad():
         for i, answer in enumerate(tqdm(answers, desc="building retrieval index ...")):
             response_dict[i] = {"answer": answer, "buttons": buttons[i]}
-            answer = normalize(answer)
+            answer = normalize(answer, with_space=True)
             tokens = tokenizer.encode(
                 answer, max_length=MAX_LEN, pad_to_max_length=True, truncation=True
             )

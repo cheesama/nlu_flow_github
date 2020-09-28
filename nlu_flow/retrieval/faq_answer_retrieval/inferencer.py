@@ -45,6 +45,7 @@ async def health():
 
 @app.post("/chitchat_retrieval/search")
 async def search_chitchat_answer(text: str):
+    text = normalize(text, with_space=True)
     tokens = tokenizer.encode(text, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
     feature = model.get_question_feature(torch.tensor(tokens).unsqueeze(0))
     distance, neighbour = index.search(feature,k = top_k)
