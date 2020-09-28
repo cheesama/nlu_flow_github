@@ -16,6 +16,9 @@ class KoelectraQAFineTuner(nn.Module):
             "monologg/koelectra-small-v2-discriminator"
         )
 
+        self.question_feature_layer = nn.Linear(self.question_net.config.hidden_size, self.question_net.config.hidden_size)
+        self.answer_feature_layer = nn.Linear(self.answer_net.config.hidden_size, self.answer_net.config.hidden_size)
+
         self.margin = margin
 
     def forward(self, q, a):
@@ -33,9 +36,11 @@ class KoelectraQAFineTuner(nn.Module):
         return question_features, answer_features
 
     def get_question_feature(self, q):
-        question_features = F.normalize(self.question_net(q)[0][:, 0, :], dim=1)
+        question_features = self.question_feature_layer(self.question_net(q)[0][:,0,:])
+        question_features = F.normalize(question_features, dim=1)
         return question_features
 
     def get_answer_feature(self, a):
-        answer_features = F.normalize(self.answer_net(a)[0][:, 0, :], dim=1)
+        answer_features = self.answer_feature_layer(self.answer_net(a)[0][:,0,:])
+        answer_features = F.normalize(answer_features, dim=1)
         return answer_features
