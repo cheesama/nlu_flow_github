@@ -57,10 +57,13 @@ for question in tqdm(meta_questions, desc='meta db faq dataset adding ...'):
     if question['faq_intent'] not in faq_class_dict:
         faq_class_dict[question['faq_intent']] = {'label': len(faq_class_dict), 'answer': question['answer'], 'buttons': question['buttons']}
 
-    questions.append(normalize(question['question']))
-    answers.append(normalize(question['answer']))
-    buttons.append(question['buttons'])
-    labels.append(faq_class_dict[question['faq_intent']]['label'])
+    try:
+        questions.append(normalize(question['question']))
+        answers.append(normalize(question['answer']))
+        buttons.append(question['buttons'])
+        labels.append(faq_class_dict[question['faq_intent']]['label'])
+    except:
+        print (f'check data: {question}')
 
 train_dataset = ChatbotFAQDataset(questions, answers, tokenizer)
 
