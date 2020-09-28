@@ -92,10 +92,7 @@ for question in tqdm(meta_questions, desc="meta db faq dataset adding ..."):
         }
 
     # check synonym is included
-    for synonym_list in synonyms:
-        if len(questions) > len(meta_questions) * 10:
-            break
-
+    for synonym_list in random.choices(synonyms, k=5):
         for i, prev_value in enumerate(synonym_list):
             if prev_value in question['question']:
                 for j, post_value in enumerate(synonym_list):
