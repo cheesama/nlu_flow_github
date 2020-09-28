@@ -4,6 +4,8 @@ from transformers import ElectraModel, ElectraTokenizer
 
 from koelectra_fine_tuner import KoelectraQAFineTuner
 
+from nlu_flow.preprocessor.text_preprocessor import normalize
+
 import torch
 import faiss
 import dill

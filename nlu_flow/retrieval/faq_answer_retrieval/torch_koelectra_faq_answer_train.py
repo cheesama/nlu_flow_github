@@ -128,6 +128,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     with torch.no_grad():
         for i, answer in enumerate(tqdm(answers, desc='building retrieval index ...')):
             response_dict[i] = {'answer': answer, 'buttons': buttons[i]}
+            answer = normalize(answer)
             tokens = tokenizer.encode(answer, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
             feature = model.get_answer_feature(torch.tensor(tokens).unsqueeze(0))
             index.train(feature.numpy())
