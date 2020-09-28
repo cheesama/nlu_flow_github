@@ -20,7 +20,7 @@ import faiss
 import dill
 import json
 
-MAX_LEN = 128
+MAX_LEN = 64
 
 tokenizer = ElectraTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
