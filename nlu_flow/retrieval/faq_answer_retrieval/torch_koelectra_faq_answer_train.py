@@ -58,10 +58,14 @@ for question in tqdm(meta_questions, desc='meta db faq dataset adding ...'):
         faq_class_dict[question['faq_intent']] = {'label': len(faq_class_dict), 'answer': question['answer'], 'buttons': question['buttons']}
 
     try:
-        questions.append(normalize(question['question']))
-        answers.append(normalize(question['answer']))
+        q = normalize(question['question'])
+        a = normalize(question['answer'])
+
+        questions.append(q)
+        answers.append(a)
         buttons.append(question['buttons'])
         labels.append(faq_class_dict[question['faq_intent']]['label'])
+
     except:
         print (f'check data: {question}')
 
