@@ -20,7 +20,7 @@ def train_faq_classifier():
     utterances = []
     labels = []
 
-    ## get synonym data for data augmentation(for FAQ domain data augmentation)
+    ## get synonym data for data augmentation(for FAQ data augmentation)
     synonyms = []
     synonym_data = meta_db_client.get("meta-entities")
     for data in tqdm(
