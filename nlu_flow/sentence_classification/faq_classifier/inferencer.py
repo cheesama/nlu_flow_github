@@ -27,7 +27,7 @@ async def health():
 
 @app.post("/faq_classifier/predict")
 async def predict_faq(text: str):
-    name = model.predict([normalize(text)])[0]
+    name = model.predict([normalize(text, with_space=True)])[0]
     confidence = model.predict_proba([normalize(text)])[0].max()
 
     return {'name': name, 'confidence': confidence, 'Classifier': 'faq_classifier_model.svc'}

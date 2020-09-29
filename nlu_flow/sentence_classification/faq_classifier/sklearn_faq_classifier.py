@@ -37,6 +37,10 @@ def train_faq_classifier():
 
     faq_data = meta_db_client.get("nlu-faq-questions")
     for data in tqdm(faq_data, desc=f"collecting faq data ... "):
+        if data['faq_intent'] is None or len(data['faq_intent']) < 2:
+            print (f'check data! : {data}')
+            continue
+
         target_utterance = normalize(data["question"])
 
         # check synonym is included
