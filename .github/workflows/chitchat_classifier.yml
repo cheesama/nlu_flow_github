@@ -16,7 +16,7 @@ jobs:
             apt-get install -y python3-dev
             pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements_model.txt
             python setup.py install
-            cd nlu_flow/sentence_classification/chitchat_classifier/sklearn_svm && pip install -r requirements.txt && python sklearn_chitchat_classifier.py && cp * ../../../
+            cd nlu_flow/sentence_classification/chitchat_classifier/sklearn_svm && pip install -r requirements.txt && python sklearn_chitchat_classifier.py && cp * ../../../../
             # Write your CML report
             cml-send-comment report.md
       - name: Push Docker image to GitHub Packages
@@ -28,5 +28,16 @@ jobs:
             repository: cheesama/nlu_flow/chitchat_classifier
             tag_with_ref: true
             # docker login https://docker.pkg.github.com -u USERNAME --password-stdin
-            
+
+      # Connect to Azure Container registry (ACR)
+      - uses: azure/docker-login@v1
+        with:
+            login-server: ${{ secrets.REGISTRY_NAME }}.azurecr.io
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # Container build and push to a Azure Container registry (ACR)
+      - run: |
+            docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }}
+            docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }}
       
