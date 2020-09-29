@@ -38,6 +38,6 @@ jobs:
 
       # Container build and push to a Azure Container registry (ACR)
       - run: |
-            docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }}
-            docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }}
+            docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/chitchat_classifier:${{ github.sha }}
+            docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/chitchat_classifier:${{ github.sha }}
       
