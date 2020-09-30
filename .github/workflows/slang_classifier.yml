@@ -45,8 +45,9 @@ jobs:
             echo ::set-env name=REPORT::$(cat report.md)
 
       - name: Slack notification
+        uses: rtCamp/action-slack-notify@master
         env:
             SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        uses: Ilshidur/action-slack@2.0.2    
-        with:
-            args: ${{ env.REPORT }}
+            SLACK_MESSAGE: ${{ env.REPORT }}
+            MSG_MINIMAL: true
+

@@ -40,4 +40,15 @@ jobs:
       - run: |
             docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/chitchat_classifier:${{ github.sha }}
             docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/chitchat_classifier:${{ github.sha }}
+
+      - name: set report as env
+        run: |
+            echo ::set-env name=REPORT::$(cat report.md)
+
+      - name: Slack notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+            SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+            SLACK_MESSAGE: ${{ env.REPORT }}
+            MSG_MINIMAL: true
       
