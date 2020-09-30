@@ -141,7 +141,7 @@ def train_domain_classifier():
 
     with open("report.md", "w") as reportFile:
         print("domain classification result", file=reportFile)
-        print(classification_report(y_test, y_pred), file=reportFile)
+        print(classification_report(y_test, y_pred, output_dict=True), file=reportFile)
 
     # save domain classifier model
     with open("domain_classifier_model.svc", "wb") as f:

@@ -48,7 +48,7 @@ def train_chitchat_classifier():
 
     with open("report.md", "w") as reportFile:
         print("chitchat classification result", file=reportFile)
-        print(classification_report(y_test, y_pred), file=reportFile)
+        print(classification_report(y_test, y_pred, output_dict=True), file=reportFile)
 
     # save chitchat classifier model
     with open("chitchat_classifier_model.svc", "wb") as f:

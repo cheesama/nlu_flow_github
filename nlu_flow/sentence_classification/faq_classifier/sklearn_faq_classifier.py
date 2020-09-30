@@ -72,7 +72,7 @@ def train_faq_classifier():
 
     with open("report.md", "w") as reportFile:
         print("faq classification result", file=reportFile)
-        print(classification_report(y_test, y_pred), file=reportFile)
+        print(classification_report(y_test, y_pred, output_dict=True), file=reportFile)
 
     # save faq classifier model
     with open("faq_classifier_model.svc", "wb") as f:
