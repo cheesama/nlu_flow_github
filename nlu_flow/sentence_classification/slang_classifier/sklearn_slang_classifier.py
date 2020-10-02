@@ -48,9 +48,14 @@ def train_slang_classifier():
     y_pred = rf.predict(X_test)
     print(classification_report(y_test, y_pred))
 
+    reportDict = {}
+    for k, v in classification_report(y_test, y_pred, output_dict=True).items():
+        if 'avg' in k:
+            reportDict[k] = v
+
     with open("report.md", "w") as reportFile:
-        print('slang classification result', file=reportFile)
-        print(classification_report(y_test, y_pred, output_dict=True), file=reportFile)
+        print('slang classification result\n', file=reportFile)
+        print(reportDict, file=reportFile)
 
     # save slang classifier model
     '''

@@ -46,9 +46,14 @@ def train_chitchat_classifier():
     y_pred = svc.predict(X_test)
     print(classification_report(y_test, y_pred))
 
+    reportDict = {}
+    for k, v in classification_report(y_test, y_pred, output_dict=True).items():
+        if 'avg' in k:
+            reportDict[k] = v
+
     with open("report.md", "w") as reportFile:
-        print("chitchat classification result", file=reportFile)
-        print(classification_report(y_test, y_pred, output_dict=True), file=reportFile)
+        print("chitchat classification result\n", file=reportFile)
+        print(reportDict, file=reportFile)
 
     # save chitchat classifier model
     with open("chitchat_classifier_model.svc", "wb") as f:
