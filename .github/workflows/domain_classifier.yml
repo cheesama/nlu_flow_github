@@ -16,7 +16,7 @@ jobs:
             apt-get install python3-dev
             pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements_model.txt
             python setup.py install
-            cd nlu_flow/sentence_classification/domain_classifier && pip install -r requirements.txt && python sklearn_domain_classifier.py && cp * ../../../
+            cd nlu_flow/sentence_classification/domain_classifier && pip install -r requirements.txt && python sklearn_domain_classifier.py && cp -r * ../../../
             # Write your CML report
             cml-send-comment report.md
       - name: Push Docker image to GitHub Packages
@@ -41,6 +41,14 @@ jobs:
             docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/domain_classifier:${{ github.sha }}
             docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/domain_classifier:${{ github.sha }}
 
+      - uses: Azure/k8s-deploy@v1
+        with:
+            namespace: ${{ secrets.NAMESPACE }}
+            manifests: |
+                manifests/deployment.yaml
+                manifests/service.yaml
+            images: ${{ secrets.REGISTRY_NAME }}.azurecr.io/domain_classifier:${{ github.sha }}
+
       - name: set report as env
         run: |
             echo ::set-env name=REPORT::$(cat report.md)
@@ -51,5 +59,7 @@ jobs:
             SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
             SLACK_MESSAGE: ${{ env.REPORT }}
             MSG_MINIMAL: true
+
+
             
       
