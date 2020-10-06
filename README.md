@@ -10,7 +10,7 @@ graph LR
   A --> AC[entity_synonym_mapper]
   
   B[sentence_classification] --> BA[domain_classifier]
-  B[sentence_classification] --> BB[intent_classifier]
+  B[sentence_classification] --> BB[faq_classifier]
   B[sentence_classification] --> BC[chitchat_classifier]
   B[sentence_classification] --> BD[slang_classifier]
   
