@@ -31,7 +31,7 @@ async def health():
     return output
 
 
-@app.post("/chitchat_classifier/predict")
+@app.post("/predict")
 async def chitchat_response(text: str):
     name = model.predict([normalize(text)])[0]
     confidence = model.predict_proba([normalize(text)])[0].max()
@@ -40,5 +40,5 @@ async def chitchat_response(text: str):
         "class": name,
         "confidence": confidence,
         "response": random.choice(response_dict[name]),
-        "Classifier": "chitchat_classifier_model.svc",
+        "classifier": "chitchat_classifier_model.svc",
     }

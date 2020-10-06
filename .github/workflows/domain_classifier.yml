@@ -1,4 +1,3 @@
-  
 name: domain_classifier_model_deploy
 on: [push]
 jobs:
@@ -13,7 +12,7 @@ jobs:
           META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         run: |
             apt-get update
-            apt-get install python3-dev
+            apt-get install -y python3-dev
             pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements_model.txt
             python setup.py install
             cd nlu_flow/sentence_classification/domain_classifier && pip install -r requirements.txt && python sklearn_domain_classifier.py && cp -r * ../../../
@@ -66,7 +65,3 @@ jobs:
             SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
             SLACK_MESSAGE: ${{ env.REPORT }}
             MSG_MINIMAL: true
-
-
-            
-      

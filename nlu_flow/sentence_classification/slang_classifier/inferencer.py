@@ -25,10 +25,10 @@ async def health():
         output = {'code': 500}
     return output
 
-@app.post("/slang_classifier/predict")
+@app.post("/predict")
 async def predict_slang(text: str):
     name = model.predict([normalize(text)])[0]
     confidence = model.predict_proba([normalize(text)])[0].max()
 
-    return {'label': name, 'confidence': confidence, 'Classifier': 'slang_classifier_model.rf'}
+    return {'label': name, 'confidence': confidence, 'classifier': 'slang_classifier_model.rf'}
 
