@@ -41,6 +41,12 @@ jobs:
             docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/domain_classifier:${{ github.sha }}
             docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/domain_classifier:${{ github.sha }}
 
+      - uses: azure/k8s-set-context@v1
+        with:
+            method: kubeconfig
+            kubeconfig: ${{ secrets.KUBECONFIG }}
+        id: setcontext
+
       - uses: Azure/k8s-deploy@v1
         with:
             namespace: ${{ secrets.NAMESPACE }}
