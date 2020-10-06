@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: chitchat-classifier
+  name: chitchat-classifier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chitchat-classifier
+  template:
+    metadata:
+      labels:
+        app: chitchat-classifier
+    spec:
+      containers:
+      - image: acrcommbot.azurecr.io/chitchat_classifier
+        name: chitchat-classifier
+        ports:
+        - containerPort: 8000
+        resources: {}

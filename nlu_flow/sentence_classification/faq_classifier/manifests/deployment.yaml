@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: faq-classifier
+  name: faq-classifier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: faq-classifier
+  template:
+    metadata:
+      labels:
+        app: faq-classifier
+    spec:
+      containers:
+      - image: acrcommbot.azurecr.io/faq_classifier
+        name: faq-classifier
+        ports:
+        - containerPort: 8000
+        resources: {}
