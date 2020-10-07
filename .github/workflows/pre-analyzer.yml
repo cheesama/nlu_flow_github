@@ -41,6 +41,8 @@ jobs:
         id: setcontext
 
       - uses: Azure/k8s-deploy@v1
+        env:
+            META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         with:
             namespace: ${{ secrets.NAMESPACE }}
             manifests: |

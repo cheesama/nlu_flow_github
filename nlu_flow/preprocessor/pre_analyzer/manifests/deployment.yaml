@@ -20,3 +20,6 @@ spec:
         ports:
         - containerPort: 8000
         resources: {}
+        env:
+        - name: META_ENDPOINT
+          value: "$(META_ENDPOINT)"
