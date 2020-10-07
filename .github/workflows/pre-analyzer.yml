@@ -6,6 +6,9 @@ jobs:
     container: docker://dvcorg/cml-py3:latest
     steps:
       - uses: actions/checkout@v2
+      - name: copy files
+        run: |
+            cd nlu_flow/preprocessor/pre_analyzer && cp -r * ../../../
       - name: Push Docker image to GitHub Packages
         uses: docker/build-push-action@v1
         with:
