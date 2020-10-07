@@ -7,6 +7,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: copy files
+        env:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         run: |
             cd nlu_flow/preprocessor/pre_analyzer && cp -r * ../../../
       - name: Push Docker image to GitHub Packages
