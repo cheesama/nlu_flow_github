@@ -53,7 +53,7 @@ jobs:
             manifests: |
                 manifests/deployment.yaml
                 manifests/service.yaml
-            images: ${{ secrets.REGISTRY_NAME }}.azurecr.io/chitchat_classifier:&{{ github.sha }}
+            images: ${{ secrets.REGISTRY_NAME }}.azurecr.io/chitchat_classifier:${{ github.sha }}
             kubectl-version: 'latest'
 
       - name: set report as env
