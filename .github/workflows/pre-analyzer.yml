@@ -29,9 +29,13 @@ jobs:
             username: ${{ secrets.REGISTRY_USERNAME }}
             password: ${{ secrets.REGISTRY_PASSWORD }}
 
+      - name: set env variables
+        run: |
+            echo ::set-env name=META_ENDPOINT::${{ secrets.META_ENDPOINT }}
+
       # Container build and push to a Azure Container registry (ACR)
       - run: |
-            docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/pre-analyzer:${{ github.sha }}
+            docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/pre-analyzer:${{ github.sha }} --build-arg META_ENDPOINT
             docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/pre-analyzer:${{ github.sha }}
 
       - uses: azure/k8s-set-context@v1
@@ -39,10 +43,6 @@ jobs:
             method: kubeconfig
             kubeconfig: ${{ secrets.KUBECONFIG }}
         id: setcontext
-
-      - name: set env variables
-        run: |
-            echo ::set-env name=META_ENDPOINT::${{ secrets.META_ENDPOINT }}
 
       - uses: Azure/k8s-deploy@v1
         with:
