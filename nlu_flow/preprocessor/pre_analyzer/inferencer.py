@@ -54,22 +54,41 @@ slang_responses = meta_db_client.get("nlu-slang-responses")
 for data in tqdm(slang_responses, desc="storing slang-responses"):
     slang_response_list.append(data["response"])
 
+
+## add FAQ questions and keywords to pre_analysis dictionary
+faq_response_dict = {}
+
 faq_rules = meta_db_client.get("nlu-faq-questions")
-for data in tqdm(faq_rules, desc="storing faq-rules"):
+for data in tqdm(faq_rules, desc="storing faq-questions ..."):
     pre_analysis_dict[normalize(data["question"])] = {
         "intent": "intent_FAQ",
+        "faq_intent": data["faq_intent"],
+        "answer": data["answer"],
+        "buttons": data["buttons"]
+    }
+
+    if data["faq_intent"] not in faq_response_dict:
+        faq_response_dict[data["faq_intent"]] = {"answer": data["answer"], "buttons": data["buttons"]}
+
+faq_keywords = meta_db_client.get("faq-keywords")
+for data in tqdm(faq_keywords, desc="storing faq-keywords ..."):
+    pre_analysis_dict[normalize(data["keyword"])] = {
+        "intent": "intent_FAQ",
+        "faq_intent": data['intent_id']['intent'],
+        "answer": faq_response_dict[data['intent_id']['intent']]["answer"],
+        "buttons": faq_response_dict[data['intent_id']['intent']]["buttons"]
     }
 
 is_ready = True
 
-def analyze_text_with_pre_analyzer(text: str, analysis_dict: dict, lev_distance_threshold=90):
+def analyze_text_with_pre_analyzer(text: str, analysis_dict: dict, lev_distance_threshold=95):
     text = normalize(text)
 
     ## 1. check intent_name is set directly
     if "intent_" in text:
         return {"name": text.strip(), "confidence": 1.0, "classifier": "pre-analyzer"}
 
-    ## 2. check text exist in pre_analsis_dictionary
+    ## 2. check text exist in pre_analysis_dictionary
     if text in pre_analysis_dict:
         result = pre_analysis_dict[text]
 
