@@ -40,9 +40,11 @@ jobs:
             kubeconfig: ${{ secrets.KUBECONFIG }}
         id: setcontext
 
+      - name: set env variables
+        run: |
+            echo ::set-env name=META_ENDPOINT::${{ secrets.META_ENDPOINT }}
+
       - uses: Azure/k8s-deploy@v1
-        env:
-            META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         with:
             namespace: ${{ secrets.NAMESPACE }}
             manifests: |

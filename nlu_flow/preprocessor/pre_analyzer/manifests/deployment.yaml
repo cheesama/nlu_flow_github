@@ -22,4 +22,4 @@ spec:
         resources: {}
         env:
         - name: META_ENDPOINT
-          value: "$(META_ENDPOINT)"
+          value: ${{ META_ENDPOINT }}
