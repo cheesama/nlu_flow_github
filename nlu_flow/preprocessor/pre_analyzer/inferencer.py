@@ -67,7 +67,7 @@ def analyze_text_with_pre_analyzer(text: str, analysis_dict: dict, lev_distance_
 
     ## 1. check intent_name is set directly
     if "intent_" in text:
-        return {"name": text.strip(), "confidence": 1.0, "classifier": "pre_analyzer"}
+        return {"name": text.strip(), "confidence": 1.0, "classifier": "pre-analyzer"}
 
     ## 2. check text exist in pre_analsis_dictionary
     if text in pre_analysis_dict:
@@ -81,7 +81,7 @@ def analyze_text_with_pre_analyzer(text: str, analysis_dict: dict, lev_distance_
             result["response"] = random.choice(slang_response_list)
 
         result["confidence"] = 1.0
-        result["classifier"] = "pre_analyzer"
+        result["classifier"] = "pre-analyzer"
 
         return result
 
@@ -92,7 +92,7 @@ def analyze_text_with_pre_analyzer(text: str, analysis_dict: dict, lev_distance_
                 result = {
                     "intent": "intent_slang",
                     "confidence": 1.0,
-                    "classifier": "pre_analyzer",
+                    "classifier": "pre-analyzer",
                     "response": random.choice(slang_response_list),
                 }
 
@@ -109,7 +109,7 @@ def analyze_text_with_pre_analyzer(text: str, analysis_dict: dict, lev_distance_
             similarity_result_info['response'] = similarity_result[0]
             similarity_result_info['confidence'] = similarity_result[1] * 0.01
             similarity_result_info['lev_distance_threshold'] = lev_distance_threshold * 0.01
-            similarity_result_info['classifier'] = 'pre_analyzer'
+            similarity_result_info['classifier'] = 'pre-analyzer'
 
         return similarity_result_info
         
@@ -122,7 +122,7 @@ async def health():
         output = {'code': 500}
     return output
 
-@app.post("/pre_analyzer/predict")
+@app.post("/predict")
 async def match_pre_analyzer(text: str):
     return analyze_text_with_pre_analyzer(text, pre_analysis_dict)
 
