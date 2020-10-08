@@ -52,9 +52,7 @@ def train_scenario_classifier():
             for each_synonym in data.get("meta_synonyms")
         ] + [normalize(data.get("Entity_Value"))]
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        utterances, labels, random_state=88
-    )
+    X_train, X_test, y_train, y_test = train_test_split(utterances, labels, random_state=88, test_size=0.1)
 
     svc = make_pipeline(CountVectorizer(analyzer="char_wb"), SVC(probability=True))
     print("scenario classifier training(with SVC)")
