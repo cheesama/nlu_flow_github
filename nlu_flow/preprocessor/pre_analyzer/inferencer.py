@@ -72,12 +72,15 @@ for data in tqdm(faq_rules, desc="storing faq-questions ..."):
 
 faq_keywords = meta_db_client.get("faq-keywords")
 for data in tqdm(faq_keywords, desc="storing faq-keywords ..."):
-    pre_analysis_dict[normalize(data["keyword"])] = {
-        "intent": "intent_FAQ",
-        "faq_intent": data['intent_id']['intent'],
-        "answer": faq_response_dict[data['intent_id']['intent']]["answer"],
-        "buttons": faq_response_dict[data['intent_id']['intent']]["buttons"]
-    }
+    try:
+        pre_analysis_dict[normalize(data["keyword"])] = {
+            "intent": "intent_FAQ",
+            "faq_intent": data['intent_id']['intent'],
+            "answer": faq_response_dict[data['intent_id']['intent']]["answer"],
+            "buttons": faq_response_dict[data['intent_id']['intent']]["buttons"]
+        }
+    except:
+        print (f'check data: {data}')
 
 is_ready = True
 
