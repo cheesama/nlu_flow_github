@@ -12,6 +12,7 @@ RUN buildDeps='gcc libc6-dev make' \
     && apt-get purge -y --auto-remove $buildDeps
 
 WORKDIR /workspace/
+COPY utils.py /workspace/utils.py
 COPY inferencer.py /workspace/inferencer.py
 COPY crf_entity_extractor.crfsuite /workspace/crf_entity_extractor.crfsuite
 

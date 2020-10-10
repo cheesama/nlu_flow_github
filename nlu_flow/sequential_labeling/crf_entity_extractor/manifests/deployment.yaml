@@ -2,21 +2,21 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: domain-classifier
-  name: domain-classifier
+    app: entity-extractor
+  name: entity-extractor
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: domain-classifier
+      app: entity-extractor
   template:
     metadata:
       labels:
-        app: domain-classifier
+        app: entity-extractor
     spec:
       containers:
-      - image: acrcommbot.azurecr.io/domain_classifier
-        name: domain-classifier
+      - image: acrcommbot.azurecr.io/crf_entity_extractor
+        name: entity-extractor
         ports:
         - containerPort: 8000
         resources: {}

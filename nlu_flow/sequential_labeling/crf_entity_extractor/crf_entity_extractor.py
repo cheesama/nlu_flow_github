@@ -28,6 +28,22 @@ import pycrfsuite
 
 def train_crf_entity_extractor():
     entity_dataset = []
+
+    ## get synonym data for data augmentation
+    synonyms = []
+    synonym_data = meta_db_client.get("meta-entities")
+    for data in tqdm(
+        synonym_data, desc=f"collecting synonym data for data augmentation ..."
+    ):
+        if type(data) != dict:
+            print(f"check data type : {data}")
+            continue
+
+        synonyms.append(
+            [each_synonym.get("synonym") for each_synonym in data.get("meta_synonyms")]
+            + [data.get("Entity_Value")]
+        )
+
     scenario_data = meta_db_client.get("nlu-intent-entity-utterances")
 
     for data in tqdm(scenario_data, desc=f"generating entity dataset ..."):
