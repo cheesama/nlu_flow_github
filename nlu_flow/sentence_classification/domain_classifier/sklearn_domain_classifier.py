@@ -66,10 +66,10 @@ def train_domain_classifier():
             print(f"check data type : {data}")
             continue
 
-        synonyms += [
+        synonyms.append([
             normalize(each_synonym.get("synonym"))
             for each_synonym in data.get("meta_synonyms")
-        ] + [normalize(data.get("Entity_Value"))]
+        ] + [normalize(data.get("Entity_Value"))])
 
     ## FAQ domain
     for faq_table in faq_table_list:

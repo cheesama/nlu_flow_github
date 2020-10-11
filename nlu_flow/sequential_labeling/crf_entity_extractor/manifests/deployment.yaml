@@ -15,7 +15,7 @@ spec:
         app: entity-extractor
     spec:
       containers:
-      - image: acrcommbot.azurecr.io/crf_entity_extractor
+      - image: acrcommbot.azurecr.io/entity_extractor
         name: entity-extractor
         ports:
         - containerPort: 8000
