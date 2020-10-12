@@ -48,9 +48,18 @@ def train_crf_entity_extractor():
 
     for data in tqdm(scenario_data, desc=f"generating entity dataset ..."):
         if data["entities"] is not None and len(data["entities"]) > 0:
-            entity_dataset.append(
-                convert_ner_data_format(data["utterance"], data["entities"])
-            )
+            if len(data['entities']) == 1: #synonym data augmentation
+                for synonym in synonyms:
+                    entity_value = data['entities'][0]['value']
+                    if entity_value in synonym:
+                        for synonym_value in synonym:
+                            synonym_tag = data['entities']
+                            synonym_tag[0]['end'] = synonym_tag[0]['start'] + len(synonym_value)
+                            entity_dataset.append(convert_ner_data_format(data["utterance"].replace(entity_value, synonym_value), synonym_tag))
+
+            entity_dataset.append(convert_ner_data_format(data["utterance"], data["entities"]))
+
+    print (f'total entity dataset num : {len(entity_dataset)}')
 
     # split entity dataset by train & val
     X_train, X_test, y_train, y_test = train_test_split(
