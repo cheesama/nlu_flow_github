@@ -64,4 +64,3 @@ jobs:
         env:
             SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
             SLACK_MESSAGE: ${{ env.REPORT }}
-            MSG_MINIMAL: true

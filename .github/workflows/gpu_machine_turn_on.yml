@@ -1,0 +1,37 @@
+name: gpu_machine_turn_on_off
+on: [push]
+jobs:
+  run:
+    runs-on: [ubuntu-latest]
+    container: docker://dvcorg/cml-py3:latest
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: GPU machine turn on
+        uses: azure/CLI@v1
+        with:
+            azcliversion: 2.0.72
+            inlineScript: |
+                az vm start -g ${{ secrets.RESOURCE_GROUP_NAME }} -n ${{ secrets.GPU_VM_NAME }}
+
+      - name: Slack notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+            SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+            SLACK_MESSAGE: GPU machine turned on
+
+      - name: GPU machine turn off
+        uses: azure/CLI@v1
+        with:
+            azcliversion: 2.0.72
+            inlineScript: |
+                az vm deallocate -g ${{ secrets.RESOURCE_GROUP_NAME }} -n ${{ secrets.GPU_VM_NAME }}
+
+      - name: Slack notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+            SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+            SLACK_MESSAGE: GPU machine turned off
