@@ -5,15 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Azure Login
-        uses: azure/login@v1
+        uses: azure/login@v1.1
         with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: GPU machine turn on
-        uses: azure/CLI@v1
-        with:
-            azcliversion: 2.0.72
-            inlineScript: |
+        run: |
                 az vm start -g ${{ secrets.RESOURCE_GROUP_NAME }} -n ${{ secrets.GPU_VM_NAME }}
 
       - name: Slack notification
@@ -23,10 +20,7 @@ jobs:
             SLACK_MESSAGE: GPU machine turned on
 
       - name: GPU machine turn off
-        uses: azure/CLI@v1
-        with:
-            azcliversion: 2.0.72
-            inlineScript: |
+        run: |
                 az vm deallocate -g ${{ secrets.RESOURCE_GROUP_NAME }} -n ${{ secrets.GPU_VM_NAME }}
 
       - name: Slack notification
