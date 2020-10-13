@@ -2,8 +2,7 @@ name: gpu_machine_turn_on_off
 on: [push]
 jobs:
   run:
-    runs-on: [ubuntu-latest]
-    container: docker://dvcorg/cml-py3:latest
+    runs-on: ubuntu-latest
     steps:
       - name: Azure Login
         uses: azure/login@v1
