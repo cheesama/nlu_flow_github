@@ -55,7 +55,7 @@ async def predict_entities(text: str):
             if i < len(entities) - 1 and entities[i][2:] == entities[i+1][2:]:
                 continue
 
-            result.append({'entity': entity_value, 'value': token_value})
+            result.append({'entity': entity_value, 'value': token_value, 'start': text.find(token_value), 'end': text.find(token_value) + len(token_value)})
             token_value = ''
             entity_value = ''
 

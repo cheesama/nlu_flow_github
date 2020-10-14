@@ -53,6 +53,17 @@ async def match_rule_entities(text: str):
             entity = {"start": match.start(), "end": match.end(), "value": match.group(), "confidence": 1.0, "entity": k}
             extracted.append(entity)
 
-    return extracted
+    #organize overlapped entities
+    remove_overlapped = []
+    extracted.sort(key=lambda x: len(x.get('value')), reverse=True)
+    for i, target_entity in enumerate(extracted):
+        for j, compare_entity in enumerate(extracted):
+            if i == j: continue
+            if compare_entity['start'] <= target_entity['start'] and target_entity['end'] <= compare_entity['end']:
+                break
+            if j == len(extracted) - 1:
+                remove_overlapped.append(target_entity)
+
+    return remove_overlapped
 
 
