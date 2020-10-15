@@ -8,6 +8,7 @@ RUN buildDeps='gcc libc6-dev make libgomp1' \
     && pip install --upgrade pip \
     && pip install --upgrade psutil \
     && pip install -r req.txt \
+    && pip install mxnet \
     && pip install git+http://github.com/SKT-AI/KoGPT2 \
     && pip install git+http://github.com/cheesama/soynlp.git \
     && pip install git+http://github.com/cheesama/nlu_flow.git \

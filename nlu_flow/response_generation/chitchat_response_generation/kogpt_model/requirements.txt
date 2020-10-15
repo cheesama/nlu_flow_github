@@ -3,7 +3,6 @@ fastapi
 uvicorn
 requests
 
-mxnet
 gluonnlp 
 sentencepiece 
 pandas 
