@@ -50,7 +50,7 @@ async def match_rule_entities(text: str):
     for k, v in patterns.items():
         matches = re.finditer(pattern=v, string=text)
         for match in matches:
-            entity = {"start": match.start(), "end": match.end(), "value": match.group(), "confidence": 1.0, "entity": k}
+            entity = {"start": match.start(), "end": match.end(), "value": match.group(), "confidence": 1.0, "entity": k, "extractor": "rule-entity-extractor"}
             extracted.append(entity)
 
     #organize overlapped entities
