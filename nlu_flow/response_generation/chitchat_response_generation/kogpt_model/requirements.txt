@@ -10,3 +10,5 @@ pandas
 torch 
 transformers 
 pytorch_lightning
+
+git+http://github.com/SKT-AI/KoGPT2
