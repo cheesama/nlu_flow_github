@@ -1,0 +1,100 @@
+name: chitchat-response-generator-deploy
+on: [push]
+jobs:
+  prepare_self-host_runner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/actions/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: GPU machine turn on
+        run: |
+                az vm start -g ${{ secrets.RESOURCE_GROUP_NAME }} -n ${{ secrets.GPU_VM_NAME }}
+
+      - name: Slack notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+            SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+            SLACK_MESSAGE: GPU machine turned on for training chitchat-response-generator
+
+  train_chitchat-response-generator:
+    runs-on: [self-hosted, linux, x64]
+    container: docker://dvcorg/cml-py3:latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: model_training
+        env:
+            repo_token: ${{ secrets.GITHUB_TOKEN }}
+            META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
+        run: |
+            apt-get update
+            apt-get install -y python3-dev
+            pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements_model.txt
+            python setup.py install
+            cd nlu_flow/response_generation/chitchat_response_generation/kogpt_model && \
+            pip install -r requirements.txt && cd KoGPT2-chatbot && \
+            CUDA_VISIBLE_DEVICES=0 python train_torch.py --gpus 1 --train --max_epochs 5 && \
+            cd .. && cp -r * ../../../
+
+      - name: Push Docker image to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+            registry: docker.pkg.github.com
+            repository: cheesama/nlu_flow/chitchat-response-generator
+            tag_with_ref: true
+
+      # Connect to Azure Container registry (ACR)
+      - uses: azure/docker-login@v1
+        with:
+            login-server: ${{ secrets.REGISTRY_NAME }}.azurecr.io
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      #Container build and push to a Azure Container registry (ACR)
+      - run: |
+            docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/chitchat-response-generator:${{ github.sha }}
+            docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/chitchat-response-generator:${{ github.sha }}
+
+      - uses: azure/k8s-set-context@v1
+        with:
+            method: kubeconfig
+            kubeconfig: ${{ secrets.KUBECONFIG }}
+        id: setcontext
+
+      - uses: Azure/k8s-deploy@v1
+        with:
+            namespace: ${{ secrets.NAMESPACE }}
+            manifests: |
+                manifests/deployment.yaml
+                manifests/service.yaml
+            images: ${{ secrets.REGISTRY_NAME }}.azurecr.io/chitchat-response-generator:${{ github.sha }}
+            kubectl-version: 'latest'
+
+      - name: Slack notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+            SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+            SLACK_MESSAGE: chitchat-response-generator training & deploy done
+
+  shutdown_self-host_runner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/actions/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+
+      - name: GPU machine turn off
+        run: |
+                az vm deallocate -g ${{ secrets.RESOURCE_GROUP_NAME }} -n ${{ secrets.GPU_VM_NAME }}
+
+      - name: Slack notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+            SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+            SLACK_MESSAGE: GPU machine turned off after training chitchat-response-generator

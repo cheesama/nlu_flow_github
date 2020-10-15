@@ -42,8 +42,10 @@ async def health():
 
 @app.post("/predict")
 async def gererate_chitchat_repsonse(text: str):
+    response, fallback = model.inference(text)
     return {
-        "response": model.inference(text),
+        "response": response,
+        "fallback": fallback,
         "generator": "KoGPT2",
     }
 

@@ -263,6 +263,7 @@ class KoGPT2Chat(LightningModule):
                 print("simsimi > {}".format(a.strip()))
 
     def inference(self, q: str, sent="0", max_token_len=32):
+        fallback=False
         sent_tokens = self.tok(sent)
         with torch.no_grad():
             q_tok = self.tok(q)
@@ -287,6 +288,7 @@ class KoGPT2Chat(LightningModule):
                     break
 
                 if prev_token_length == len(predicted_tokens):
+                    fallback = True
                     break
                 else:
                     prev_token_length = len(predicted_tokens)
@@ -296,7 +298,7 @@ class KoGPT2Chat(LightningModule):
 
                 print (predicted_tokens)
 
-            return a.strip()
+            return a.strip(), fallback
 
 
 parser = KoGPT2Chat.add_model_specific_args(parser)
