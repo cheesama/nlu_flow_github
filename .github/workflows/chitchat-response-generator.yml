@@ -34,7 +34,7 @@ jobs:
             pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements_model.txt
             python setup.py install
             cd nlu_flow/response_generation/chitchat_response_generation/kogpt_model && \
-            pip install -r requirements.txt && pip install mxnet-cu101 && \
+            pip install -r requirements.txt && pip install mxnet-cu102 && \
             pip install git+http://github.com/SKT-AI/KoGPT2 && cd KoGPT2-chatbot && \
             CUDA_VISIBLE_DEVICES=0 python train_torch.py --gpus 1 --train --max_epochs 5 && \
             cd .. && cp -r * ../../../
@@ -81,17 +81,23 @@ jobs:
             SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
             SLACK_MESSAGE: chitchat-response-generator training & deploy done
 
+  shutdown_self-host_runner:
+    needs: train_chitchat-response-generator
+    runs-on: ubuntu-latest
+    steps:
       - name: Azure Login
         uses: azure/actions/login@v1
         with:
             creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: GPU machine turn off
+        run: |
+            az vm deallocate -g ${{ secrets.RESOURCE_GROUP_NAME }} -n ${{ secrets.GPU_VM_NAME }}
+
       - name: Slack notification
         uses: rtCamp/action-slack-notify@master
         env:
             SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-            SLACK_MESSAGE: GPU machine will turn off after training chitchat-response-generator
+            SLACK_MESSAGE: GPU machine turned off after training chitchat-response-generator
 
-      - name: GPU machine turn off
-        run: |
-                az vm deallocate -g ${{ secrets.RESOURCE_GROUP_NAME }} -n ${{ secrets.GPU_VM_NAME }}
+
