@@ -1,0 +1,41 @@
+name: chitchat-response-generator-deploy
+on: [push]
+jobs:
+  prepare_self-host_runner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/actions/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: GPU machine turn on
+        run: |
+                az vm start -g ${{ secrets.RESOURCE_GROUP_NAME }} -n ${{ secrets.GPU_VM_NAME }}
+
+      - name: Slack notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+            SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+            SLACK_MESSAGE: GPU machine turned on for training chitchat-response-generator
+
+  shutdown_self-host_runner:
+    needs: train_chitchat-response-generator
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure Login
+        uses: azure/actions/login@v1
+        with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: GPU machine turn off
+        run: |
+            az vm deallocate -g ${{ secrets.RESOURCE_GROUP_NAME }} -n ${{ secrets.GPU_VM_NAME }}
+
+      - name: Slack notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+            SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+            SLACK_MESSAGE: GPU machine turned off after training chitchat-response-generator
+
+
