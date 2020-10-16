@@ -1,4 +1,4 @@
-name: chitchat-response-generator-deploy
+name: gpu training preparing
 on: [push]
 jobs:
   prepare_self-host_runner:
