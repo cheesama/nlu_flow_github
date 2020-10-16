@@ -33,7 +33,7 @@ jobs:
             pip3 install -r requirements.txt && pip3 install -r requirements_model.txt
             python3 setup.py install
             cd nlu_flow/response_generation/chitchat_response_generation/kogpt_model && \
-            pip3 install -r requirements.txt && pip3 install mxnet-cu101 && \
+            pip3 install -r requirements.txt && \
             pip3 install git+http://github.com/SKT-AI/KoGPT2 && cd KoGPT2-chatbot && \
             CUDA_VISIBLE_DEVICES=0 python3 train_torch.py --gpus 1 --train --max_epochs 5 && \
             cd .. && cp -r * ../../../
