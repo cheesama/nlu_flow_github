@@ -29,7 +29,7 @@ jobs:
             repo_token: ${{ secrets.GITHUB_TOKEN }}
             META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         run: |
-            apt-get update && apt-get install gcc libc6-dev make libgomp1
+            apt-get update && apt-get install -y gcc libc6-dev make libgomp1
             pip3 install -r requirements.txt && pip3 install -r requirements_model.txt
             python3 setup.py install
             cd nlu_flow/response_generation/chitchat_response_generation/kogpt_model && \
