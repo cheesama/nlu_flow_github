@@ -19,7 +19,7 @@ is_ready = False
 
 # load model
 parser = argparse.ArgumentParser(description='Simsimi based on KoGPT-2')
-parser.add_argument('--model_params', type=str, default='model_chp/model_last.ckpt', help='model binary for starting chat')
+parser.add_argument('--model_params', type=str, default='model_chp/model_-last.ckpt', help='model binary for starting chat')
 
 parser = KoGPT2Chat.add_model_specific_args(parser)
 parser = Trainer.add_argparse_args(parser)
