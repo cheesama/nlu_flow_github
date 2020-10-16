@@ -29,13 +29,13 @@ jobs:
             repo_token: ${{ secrets.GITHUB_TOKEN }}
             META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         run: |
-            apt-get update && apt-get install -y gcc libc6-dev make libgomp1 git wget python3-pip
-            pip3 install -r requirements.txt && pip3 install -r requirements_model.txt
+            apt-get update && apt-get install -y gcc libc6-dev make libgomp1 git wget
+            pip install -r requirements.txt && pip install -r requirements_model.txt
             python3 setup.py install
             cd nlu_flow/response_generation/chitchat_response_generation/kogpt_model && \
-            pip3 install -r requirements.txt && \
-            pip3 install git+http://github.com/SKT-AI/KoGPT2 && cd KoGPT2-chatbot && \
-            CUDA_VISIBLE_DEVICES=0 python3 train_torch.py --gpus 1 --train --max_epochs 5 && \
+            pip install -r requirements.txt && \
+            pip install git+http://github.com/SKT-AI/KoGPT2 && cd KoGPT2-chatbot && \
+            CUDA_VISIBLE_DEVICES=0 python train_torch.py --gpus 1 --train --max_epochs 5 && \
             cd .. && cp -r * ../../../
 
       - name: Push Docker image to GitHub Packages
