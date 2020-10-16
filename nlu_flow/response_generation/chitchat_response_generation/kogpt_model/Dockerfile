@@ -14,7 +14,7 @@ RUN buildDeps='gcc libc6-dev make libgomp1' \
     && rm -rf /var/lib/apt/lists/* 
 
 WORKDIR /workspace/
-COPY KoGPT2-chatbot/model_chp/model_last.ckpt /workspace/model_chp/model_-last.ckpt
+COPY KoGPT2-chatbot/model_chp/model_-last.ckpt /workspace/model_chp/model_-last.ckpt
 COPY KoGPT2-chatbot/Chatbot_data /workspace/Chatbot_data
 COPY KoGPT2-chatbot/inferencer.py /workspace/inferencer.py
 COPY KoGPT2-chatbot/train_torch.py /workspace/train_torch.py
