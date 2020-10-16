@@ -25,5 +25,5 @@ graph LR
 
 ## Reference
 soynlp
-
 strapi
+KoGPT2
