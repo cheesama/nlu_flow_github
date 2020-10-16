@@ -1,4 +1,4 @@
-name: gpu training preparing
+name: gpu_model_deploy
 on: [push]
 jobs:
   prepare_self-host_runner:
@@ -29,6 +29,7 @@ jobs:
             META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         run: |
             sudo apt-get update
+            sudo pip install --ignore-installed PyYAML
             sudo pip install -r requirements.txt && sudo pip install -r requirements_model.txt
             python setup.py install
             cd nlu_flow/response_generation/chitchat_response_generation/kogpt_model && \
