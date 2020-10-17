@@ -29,16 +29,15 @@ jobs:
             repo_token: ${{ secrets.GITHUB_TOKEN }}
             META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         run: |
-            sudo chmod 666 /var/run/docker.sock
             sudo apt-get update && sudo apt-get install python-setuptools
             pwd
             rm -rf nlu_flow/response_generation/chitchat_response_generation/kogpt_model/KoGPT2-chatbot/model_chp
-            pip3 install --ignore-installed PyYAML
-            pip3 install -r requirements.txt && pip3 install -r requirements_model.txt
+            sudo pip3 install --ignore-installed PyYAML
+            sudo pip3 install -r requirements.txt && sudo pip3 install -r requirements_model.txt
             python setup.py install
             cd nlu_flow/response_generation/chitchat_response_generation/kogpt_model && \
-            pip3 install -r requirements.txt && \
-            pip3 install git+http://github.com/SKT-AI/KoGPT2 && cd KoGPT2-chatbot && \
+            sudo pip3 install -r requirements.txt && \
+            sudo pip3 install git+http://github.com/SKT-AI/KoGPT2 && cd KoGPT2-chatbot && \
             CUDA_VISIBLE_DEVICES=0 python train_torch.py --gpus 1 --train --max_epochs 4 && \
             cd .. && pwd && cp -r * ../../../../ && pwd && ls
 
