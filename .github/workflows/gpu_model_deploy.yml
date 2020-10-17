@@ -38,7 +38,7 @@ jobs:
             cd nlu_flow/response_generation/chitchat_response_generation/kogpt_model && \
             pip3 install --user -r requirements.txt && \
             pip3 install --user git+http://github.com/SKT-AI/KoGPT2 && cd KoGPT2-chatbot && \
-            CUDA_VISIBLE_DEVICES=0 python train_torch.py --gpus 1 --train --max_epochs 4 && \
+            CUDA_VISIBLE_DEVICES=0 python train_torch.py --gpus 1 --train --max_epochs 3 && \
             cd .. && pwd && cp -r * ../../../../ && pwd && ls
 
       - name: Push Docker image to GitHub Packages
