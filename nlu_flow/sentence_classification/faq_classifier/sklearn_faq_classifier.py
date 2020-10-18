@@ -19,6 +19,7 @@ def train_faq_classifier():
     # load dataset
     utterances = []
     labels = []
+    response_dict = {}
 
     ## get synonym data for data augmentation(for FAQ data augmentation)
     synonyms = []
@@ -40,6 +41,9 @@ def train_faq_classifier():
         if data['faq_intent'] is None or len(data['faq_intent']) < 2:
             print (f'check data! : {data}')
             continue
+
+        # assume same faq_intent questions have same answers set
+        response_dict[data["faq_intent"]] = {'prompt_id':data.get('prompt_id',''), 'answer': data.get('answer',''), 'buttons': dat.get('buttons', {})}
 
         target_utterance = normalize(data["question"])
 
@@ -84,5 +88,9 @@ def train_faq_classifier():
         dill.dump(svc, f)
         print("faq_classifier model saved : faq_classifier_model.svc")
 
+    # save faq response dict
+    with open("faq_response_dict.dill", "wb") as f:
+        dill.dump(response_dict, f)
+        print("faq response data saved : faq_response_dict.dill")
 
 train_faq_classifier()

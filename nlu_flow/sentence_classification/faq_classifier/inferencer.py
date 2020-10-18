@@ -9,11 +9,16 @@ is_ready = False
 
 #load faq_classifer_model
 model = None
+response_dict = None
 with open('./faq_classifier_model.svc', 'rb') as f:
     model = dill.load(f)
     print ('faq_classifier_model load success')
 
-if model:
+with open('./faq_response_dict.dill', 'rb') as f:
+    response_dict = dill.load(f)
+    print ('faq response data load success')
+
+if model and response_dict:
     is_ready = True
 
 #endpoints
@@ -31,6 +36,11 @@ async def predict_faq(text: str, top_k=3):
     #confidence = model.predict_proba([normalize(text)])[0].max()
     probs = model.predict_proba([normalize(text, with_space=True)])
     result = sorted( zip( model.classes_, probs[0] ), key=lambda x:x[1] )[-top_k:]
-
-    return {'result': result, 'classifier': 'faq_classifier_model.svc'}
+    dict_result = []
+    for each_result in result:
+        each_dict = {'faq_intent': each_result[0], 'confidence': each_result[1], 'classifier': 'faq_classifier_model.svc'}
+        each_dict.update(response_dict[each_result[0]])
+        dict_result.append(each_dict)
+        
+    return dict_result
 
