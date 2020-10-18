@@ -26,9 +26,11 @@ async def health():
     return output
 
 @app.post("/predict")
-async def predict_faq(text: str):
-    name = model.predict([normalize(text, with_space=True)])[0]
-    confidence = model.predict_proba([normalize(text)])[0].max()
+async def predict_faq(text: str, top_k=3):
+    #name = model.predict([normalize(text, with_space=True)])[0]
+    #confidence = model.predict_proba([normalize(text)])[0].max()
+    probs = model.predict_proba([normalize(text, with_space=True)])
+    result = sorted( zip( model.classes_, probs[0] ), key=lambda x:x[1] )[-top_k:]
 
-    return {'name': name, 'confidence': confidence, 'classifier': 'faq_classifier_model.svc'}
+    return {'result': result, 'classifier': 'faq_classifier_model.svc'}
 
