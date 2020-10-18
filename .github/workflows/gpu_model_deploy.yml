@@ -1,7 +1,7 @@
 name: gpu_model_deploy
 on: [push]
 jobs:
-  prepare_self-host_runner:
+  turn_on_self-host_runner:
     runs-on: ubuntu-latest
     steps:
       - name: Azure Login
@@ -18,6 +18,14 @@ jobs:
         env:
             SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
             SLACK_MESSAGE: GPU machine turned on for training chitchat-response-generator
+
+  prepare_self-host_runner:
+    runs-on: [self-hosted, linux, x64]
+    needs: turn_on_self-host_runner
+    steps:
+      - name: GPU machine turn on
+        run: |
+            sudo chmod 777 /var/run/docker.sock
 
   chitchat-response-generator:
     runs-on: [self-hosted, linux, x64]
