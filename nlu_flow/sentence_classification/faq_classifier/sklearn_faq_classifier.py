@@ -31,10 +31,7 @@ def train_faq_classifier():
             print(f"check data type : {data}")
             continue
 
-        synonyms += [
-            normalize(each_synonym.get("synonym"))
-            for each_synonym in data.get("meta_synonyms")
-        ] + [normalize(data.get("Entity_Value"))]
+        synonyms.append([normalize(each_synonym.get("synonym")) for each_synonym in data.get("meta_synonyms")] + [normalize(data.get("Entity_Value"))])
 
     faq_data = meta_db_client.get("nlu-faq-questions")
     for data in tqdm(faq_data, desc=f"collecting faq data ... "):
