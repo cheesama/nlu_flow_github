@@ -43,7 +43,7 @@ def train_faq_classifier():
             continue
 
         # assume same faq_intent questions have same answers set
-        response_dict[data["faq_intent"]] = {'prompt_id':data.get('prompt_id',''), 'answer': data.get('answer',''), 'buttons': dat.get('buttons', {})}
+        response_dict[data["faq_intent"]] = {'prompt_id':data.get('prompt_id',''), 'answer': data.get('answer',''), 'buttons': data.get('buttons', {})}
 
         target_utterance = normalize(data["question"])
 
