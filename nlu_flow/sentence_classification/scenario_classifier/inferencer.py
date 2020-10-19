@@ -7,11 +7,11 @@ import dill
 app = FastAPI()
 is_ready = False
 
-#load slang_classifer_model
+#load scenario_classifer_model
 model = None
-with open('./slang_classifier_model.rf', 'rb') as f:
+with open('./scenario_classifier_model.svc', 'rb') as f:
     model = dill.load(f)
-    print ('slang_classifier_model load success')
+    print ('scenario_classifier_model load success')
 
 if model:
     is_ready = True
@@ -26,9 +26,9 @@ async def health():
     return output
 
 @app.post("/predict")
-async def predict_slang(text: str):
+async def predict_scenario(text: str):
     name = model.predict([normalize(text)])[0]
     confidence = model.predict_proba([normalize(text)])[0].max()
 
-    return {'label': name, 'confidence': confidence, 'classifier': 'slang_classifier_model.rf'}
+    return {'name': name, 'confidence': confidence, 'classifier': 'scenario_classifier_model.svc'}
 

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: chitchat-response-generator
+  name: chitchat-response-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chitchat-response-generator
+  template:
+    metadata:
+      labels:
+        app: chitchat-response-generator
+    spec:
+      containers:
+      - image: acrcommbot.azurecr.io/chitchat-response-generator
+        name: chitchat-response-generator
+        ports:
+        - containerPort: 8000
+        resources: {}

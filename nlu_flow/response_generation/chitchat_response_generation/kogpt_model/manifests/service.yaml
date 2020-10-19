@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: chitchat-response-generator
+  name: chitchat-response-generator
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+  selector:
+    app: chitchat-response-generator
+  type: LoadBalancer

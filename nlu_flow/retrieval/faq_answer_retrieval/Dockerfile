@@ -15,8 +15,8 @@ RUN buildDeps='gcc libc6-dev make libomp-dev' \
 
 WORKDIR /workspace/
 COPY koelectra_fine_tuner.py /workspace/koelectra_fine_tuner.py
-COPY koelectra_chitchat_retrieval_model.modeldict /workspace/koelectra_chitchat_retrieval_model.modeldict
-COPY chitchat_retrieval_index /workspace/chitchat_retrieval_index
+COPY koelectra_faq_retrieval_model.modeldict /workspace/koelectra_faq_retrieval_model.modeldict
+COPY faq_retrieval_index /workspace/faq_retrieval_index
 COPY inferencer.py /workspace/inferencer.py
 
 EXPOSE  8000

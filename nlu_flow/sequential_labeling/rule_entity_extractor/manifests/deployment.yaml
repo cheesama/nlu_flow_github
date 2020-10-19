@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: rule-entity-extractor
+  name: rule-entity-extractor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rule-entity-extractor
+  template:
+    metadata:
+      labels:
+        app: rule-entity-extractor
+    spec:
+      containers:
+      - image: acrcommbot.azurecr.io/rule-entity-extractor
+        name: rule-entity-extractor
+        ports:
+        - containerPort: 8000
+        resources: {}

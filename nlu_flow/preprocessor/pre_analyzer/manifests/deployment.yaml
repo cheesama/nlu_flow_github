@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: pre-analyzer
+  name: pre-analyzer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pre-analyzer
+  template:
+    metadata:
+      labels:
+        app: pre-analyzer
+    spec:
+      containers:
+      - image: acrcommbot.azurecr.io/pre-analyzer
+        name: pre-analyzer
+        ports:
+        - containerPort: 8000
+        resources: {}

@@ -6,6 +6,8 @@ from koelectra_fine_tuner import KoelectraQAFineTuner
 
 from nlu_flow.utils import meta_db_client
 
+from faiss import normalize_L2
+
 from torch.nn import functional as F
 from torch.utils.data import DataLoader
 from torch.optim import Adam, lr_scheduler
@@ -18,17 +20,50 @@ import multiprocessing
 import argparse
 import random
 import faiss
+import dill
 
 MAX_LEN = 64
-
-# downlad dataset
-chatbot_corpus = KoreanChatbotKorpus()
 
 tokenizer = ElectraTokenizer.from_pretrained("monologg/koelectra-small-v2-discriminator")
 
 questions = []
 answers = []
 labels = []
+
+# downlad kopora dataset
+'''
+chatbot_corpus = KoreanChatbotKorpus()
+for i, qa in enumerate(chatbot_corpus.train):
+    questions.append(qa.text)
+    answers.append(qa.pair)
+    labels.append(i)
+'''
+
+# meta db dataset add
+chitchat_class_dict = dict()
+label_num = 0
+
+meta_responses = meta_db_client.get('nlu-chitchat-responses')
+for response in tqdm(meta_responses, desc='meta db chitchat questions & response organizing ...'):
+    if response['class_name'] is None:
+        continue
+
+    if response['class_name']['classes'] not in chitchat_class_dict:
+        chitchat_class_dict[response['class_name']['classes']] = (label_num, [])
+        label_num += 1
+
+    chitchat_class_dict[response['class_name']['classes']][1].append(response['response'])
+
+meta_questions = meta_db_client.get('nlu-chitchat-utterances')
+for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...'):
+    if question['class_name'] is None:
+        continue
+
+    for each_answer in chitchat_class_dict[question['class_name']['classes']][1]:
+        questions.append(question['utterance'])
+        answers.append(each_answer)
+        labels.append(chitchat_class_dict[question['class_name']['classes']][0])
+
 
 # prepare torch dataset
 class ChatbotKorpusDataset(torch.utils.data.Dataset):
@@ -49,37 +84,7 @@ class ChatbotKorpusDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         return torch.tensor(self.dataset[idx][0]), torch.tensor(self.dataset[idx][1]), torch.tensor(self.dataset[idx][2])
-
-# korpora dataset add
-for i, qa in enumerate(chatbot_corpus.train):
-    questions.append(qa.text)
-    answers.append(qa.pair)
-    labels.append(i)
     
-# meta db dataset add
-chitchat_class_dict = dict()
-
-meta_responses = meta_db_client.get('nlu-chitchat-responses')
-for response in tqdm(meta_responses, desc='meta db chitchat questions & response organizing ...'):
-    if response['class_name'] is None:
-        continue
-
-    if response['class_name']['classes'] not in chitchat_class_dict:
-        chitchat_class_dict[response['class_name']['classes']] = (len(labels), [])
-        labels.append(len(labels))
-
-    chitchat_class_dict[response['class_name']['classes']][1].append(response['response'])
-
-meta_questions = meta_db_client.get('nlu-chitchat-utterances')
-for question in tqdm(meta_questions, desc='meta db chitchat dataset adding ...'):
-    if question['class_name'] is None:
-        continue
-
-    for each_answer in chitchat_class_dict[question['class_name']['classes']][1]:
-        questions.append(question['utterance'])
-        answers.append(each_answer)
-        labels.append(chitchat_class_dict[question['class_name']['classes']][0])
-
 train_dataset = ChatbotKorpusDataset(questions, answers, tokenizer)
 
 def train_model(n_epochs=20, lr=0.0001, batch_size=128):
@@ -98,7 +103,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     # optimizer definition
     optimizer = Adam(model.parameters(), lr=float(lr))
     scheduler = lr_scheduler.StepLR(optimizer, 1.0, gamma=0.9)
-    loss_fn = nn.CosineEmbeddingLoss()
+    loss_fn = nn.CosineEmbeddingLoss(margin=0.5)
 
     writer = SummaryWriter(log_dir=f"runs/epochs:{n_epochs}_lr:{lr}")
     global_step = 0
@@ -123,7 +128,7 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
             label1 = label.repeat(answer.size(0), 1)
             label2 = label.unsqueeze(0).repeat(1, question.size(0),1).squeeze(0)
 
-            loss = loss_fn(question_features, answer_features, (label1==label2).float())
+            loss = loss_fn(question_features, answer_features, (label1==label2).float() + ((label1!=label2).float() * -1))
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
             optimizer.step()
@@ -140,20 +145,28 @@ def train_model(n_epochs=20, lr=0.0001, batch_size=128):
     #build_index
     model = model.cpu()
     model.eval()
-    index = faiss.IndexFlatL2(model.answer_net.config.hidden_size)   # build the index
+    index = faiss.IndexFlatIP(model.answer_net.config.hidden_size)   # build the index
+
+    response_dict = {}
 
     with torch.no_grad():
-        for answer in tqdm(answers, desc='building retrieval index ...'):
+        for i, answer in enumerate(tqdm(answers, desc='building retrieval index ...')):
+            response_dict[i] = answer
             tokens = tokenizer.encode(answer, max_length=MAX_LEN, pad_to_max_length=True, truncation=True)
             feature = model.get_answer_feature(torch.tensor(tokens).unsqueeze(0))
+            index.train(feature.numpy())
             index.add(feature.numpy())
 
     faiss.write_index(index, 'chitchat_retrieval_index')
+
+    with open('response_dict.dill', 'wb') as responseFile:
+        dill.dump(response_dict, responseFile)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--n_epochs", default=20)
     parser.add_argument("--lr", default=5e-5)
+    parser.add_argument("--batch_size", default=128)
     args = parser.parse_args()
 
-    train_model(int(args.n_epochs), float(args.lr))
+    train_model(int(args.n_epochs), float(args.lr), int(args.batch_size))

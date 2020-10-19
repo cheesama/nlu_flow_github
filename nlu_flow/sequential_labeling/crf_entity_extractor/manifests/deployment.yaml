@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: entity-extractor
+  name: entity-extractor
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: entity-extractor
+  template:
+    metadata:
+      labels:
+        app: entity-extractor
+    spec:
+      containers:
+      - image: acrcommbot.azurecr.io/entity_extractor
+        name: entity-extractor
+        ports:
+        - containerPort: 8000
+        resources: {}

@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+requests
+
+pynori
+python-crfsuite
