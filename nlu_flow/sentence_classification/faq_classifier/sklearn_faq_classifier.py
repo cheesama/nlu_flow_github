@@ -15,6 +15,7 @@ import os, sys
 import dill
 import random
 
+
 def train_faq_classifier():
     # load dataset
     utterances = []
@@ -31,34 +32,51 @@ def train_faq_classifier():
             print(f"check data type : {data}")
             continue
 
-        synonyms.append([normalize(each_synonym.get("synonym")) for each_synonym in data.get("meta_synonyms")] + [normalize(data.get("Entity_Value"))])
+        synonyms.append(
+            [
+                normalize(each_synonym.get("synonym"))
+                for each_synonym in data.get("meta_synonyms")
+            ]
+            + [normalize(data.get("Entity_Value"))]
+        )
 
     faq_data = meta_db_client.get("nlu-faq-questions")
     for data in tqdm(faq_data, desc=f"collecting faq data ... "):
-        if data['faq_intent'] is None or len(data['faq_intent']) < 2:
-            print (f'check data! : {data}')
+        if data["faq_intent"] is None or len(data["faq_intent"]) < 2:
+            print(f"check data! : {data}")
             continue
 
         # assume same faq_intent questions have same answers set
-        response_dict[data["faq_intent"]] = {'prompt_id':data.get('prompt_id',''), 'answer': data.get('answer',''), 'buttons': data.get('buttons', {})}
+        response_dict[data["faq_intent"]] = {
+            "prompt_id": data.get("prompt_id", ""),
+            "answer": data.get("answer", ""),
+            "buttons": data.get("buttons", {}),
+        }
 
         target_utterance = normalize(data["question"])
 
         # check synonym is included
-        for synonym_list in random.choices(synonyms, k=10):
+        for synonym_list in random.choices(synonyms, k=12):
             for i, prev_value in enumerate(synonym_list):
                 if prev_value in target_utterance:
                     for j, post_value in enumerate(synonym_list):
                         if i == j:
                             continue
-                        utterances.append(target_utterance.replace(prev_value, post_value))
+                        utterances.append(
+                            target_utterance.replace(prev_value, post_value)
+                        )
                         labels.append(data["faq_intent"])
                     break
 
         utterances.append(normalize(data["question"], with_space=True))
         labels.append(data["faq_intent"])
 
-    print (f'dataset num: {len(utterances)}')
+    scenario_data = meta_db_client.get("nlu-intent-entity-utterances")
+    for data in tqdm(scenario_data, desc=f"collecting scenario data ... "):
+        utterances.append(normalize(data["utterance"], with_space=True))
+        labels.append('시나리오')
+
+    print(f"dataset num: {len(utterances)}")
 
     X_train, X_test, y_train, y_test = train_test_split(
         utterances, labels, random_state=88
@@ -73,7 +91,7 @@ def train_faq_classifier():
 
     reportDict = {}
     for k, v in classification_report(y_test, y_pred, output_dict=True).items():
-        if 'avg' in k:
+        if "avg" in k:
             reportDict[k] = v
 
     with open("report.md", "w") as reportFile:
@@ -89,5 +107,6 @@ def train_faq_classifier():
     with open("faq_response_dict.dill", "wb") as f:
         dill.dump(response_dict, f)
         print("faq response data saved : faq_response_dict.dill")
+
 
 train_faq_classifier()
