@@ -23,7 +23,7 @@ with open('golden_set.tsv','r') as dataFile:
         if len(line.split('\t')) < 3:
             continue
 
-        X_test.append(normalize(line.split('\t')[1], with_space=True))
+        X_test.append(normalize(line.split('\t')[1]))
         y_test.append(line.split('\t')[0])
 
     y_pred = model.predict(X_test)

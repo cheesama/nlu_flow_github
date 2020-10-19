@@ -68,12 +68,12 @@ def train_faq_classifier():
                         labels.append(data["faq_intent"])
                     break
 
-        utterances.append(normalize(data["question"], with_space=True))
+        utterances.append(normalize(data["question"]))
         labels.append(data["faq_intent"])
 
     scenario_data = meta_db_client.get("nlu-intent-entity-utterances")
     for data in tqdm(scenario_data, desc=f"collecting scenario data ... "):
-        utterances.append(normalize(data["utterance"], with_space=True))
+        utterances.append(normalize(data["utterance"]))
         labels.append('시나리오')
 
     print(f"dataset num: {len(utterances)}")
