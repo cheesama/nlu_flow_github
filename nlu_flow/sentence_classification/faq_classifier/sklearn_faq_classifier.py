@@ -56,7 +56,7 @@ def train_faq_classifier():
         target_utterance = normalize(data["question"])
 
         # check synonym is included
-        for synonym_list in random.choices(synonyms, k=12):
+        for synonym_list in synonyms:
             for i, prev_value in enumerate(synonym_list):
                 if prev_value in target_utterance:
                     for j, post_value in enumerate(synonym_list):
