@@ -13,6 +13,7 @@ RUN buildDeps='gcc libc6-dev make' \
 
 WORKDIR /workspace/
 COPY inferencer.py /workspace/inferencer.py
+COPY test_faq_classifier.py /workspace/test_faq_classifier.py
 COPY faq_classifier_model.svc /workspace/faq_classifier_model.svc
 COPY faq_response_dict.dill /workspace/faq_response_dict.dill
 

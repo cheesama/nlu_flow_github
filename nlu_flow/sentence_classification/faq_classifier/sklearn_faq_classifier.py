@@ -72,7 +72,7 @@ def train_faq_classifier():
 
     scenario_data = meta_db_client.get("nlu-intent-entity-utterances")
 
-    for data in tqdm(random.choices(scenario_data, k=len(utterances)), desc=f"collecting scenario data ... "):
+    for data in tqdm(random.choices(scenario_data, k=len(response_dict)), desc=f"collecting scenario data ... "):
         utterances.append(normalize(data["utterance"]))
         labels.append('시나리오')
 
