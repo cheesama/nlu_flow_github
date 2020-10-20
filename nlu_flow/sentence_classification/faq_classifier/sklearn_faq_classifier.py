@@ -15,7 +15,6 @@ import os, sys
 import dill
 import random
 
-
 def train_faq_classifier():
     # load dataset
     utterances = []
@@ -72,7 +71,8 @@ def train_faq_classifier():
         labels.append(data["faq_intent"])
 
     scenario_data = meta_db_client.get("nlu-intent-entity-utterances")
-    for data in tqdm(scenario_data, desc=f"collecting scenario data ... "):
+
+    for data in tqdm(random.choices(scenario_data, k=len(utterances)), desc=f"collecting scenario data ... "):
         utterances.append(normalize(data["utterance"]))
         labels.append('시나리오')
 
