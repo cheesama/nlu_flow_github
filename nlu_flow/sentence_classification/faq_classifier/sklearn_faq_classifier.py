@@ -1,7 +1,7 @@
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
 from sklearn.pipeline import make_pipeline
-from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 
@@ -70,19 +70,20 @@ def train_faq_classifier():
         utterances.append(normalize(data["question"]))
         labels.append(data["faq_intent"])
 
+    '''
     scenario_data = meta_db_client.get("nlu-intent-entity-utterances")
-
     for data in tqdm(random.choices(scenario_data, k=len(utterances)), desc=f"collecting scenario data ... "):
         utterances.append(normalize(data["utterance"]))
         labels.append('시나리오')
+    '''
 
     print(f"dataset num: {len(utterances)}")
 
     X_train, X_test, y_train, y_test = train_test_split(
-        utterances, labels, random_state=88
+        utterances, labels, random_state=88, test_size=0.1
     )
 
-    svc = make_pipeline(CountVectorizer(analyzer="char_wb"), SVC(probability=True))
+    svc = make_pipeline(TfidfVectorizer(analyzer="char_wb"), SVC(probability=True))
     print("faq classifier training(with SVC)")
     svc.fit(X_train, y_train)
     print("model training done, validation reporting")
