@@ -83,7 +83,7 @@ def train_faq_classifier():
         utterances, labels, random_state=88, test_size=0.1
     )
 
-    svc = make_pipeline(TfidfVectorizer(analyzer="char_wb"), SVC(probability=True))
+    svc = make_pipeline(TfidfVectorizer(analyzer="char_wb", ngram_range=(1,5)), SVC(probability=True))
     print("faq classifier training(with SVC)")
     svc.fit(X_train, y_train)
     print("model training done, validation reporting")

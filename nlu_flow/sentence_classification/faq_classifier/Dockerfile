@@ -4,7 +4,7 @@ USER root
 
 COPY requirements.txt req.txt
 RUN buildDeps='gcc libc6-dev make' \
-    && apt-get update && apt-get install -y $buildDeps git wget tar \
+    && apt-get update && apt-get install -y $buildDeps git wget tar vim \
     && pip install --upgrade pip \
     && pip install -r req.txt \
     && pip install git+http://github.com/cheesama/nlu_flow.git \
