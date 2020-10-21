@@ -4,6 +4,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.model_selection import GridSearchCV
 
 from tqdm import tqdm
 from pprint import pprint
@@ -81,9 +82,23 @@ def train_faq_classifier():
         utterances, labels, random_state=88, test_size=0.1
     )
 
-    svc = make_pipeline(TfidfVectorizer(analyzer="char_wb", ngram_range=(1,6)), SVC(probability=True, gamma='auto'))
+    svc = make_pipeline(TfidfVectorizer(analyzer="char_wb", ngram_range=(1,6)), SVC(probability=True))
     print("faq classifier training(with SVC)")
-    svc.fit(X_train, y_train)
+    #svc.fit(X_train, y_train)
+
+    # Parameter Grid
+    param_grid = {'C': [0.1, 1, 10, 100], 'gamma': [1, 0.1, 0.01, 0.001, 0.00001, 10]}
+
+    # Make grid search classifier
+    clf_grid = GridSearchCV(svc, param_grid, verbose=1)
+
+    # Train the classifier
+    clf_grid.fit(X_train, y_train)
+
+    print("Best Parameters:\n", clf_grid.best_params_)
+    print("Best Estimators:\n", clf_grid.best_estimator_)
+    svc = clf_grid.best_estimator_()
+
     print("model training done, validation reporting")
     y_pred = svc.predict(X_test)
     print(classification_report(y_test, y_pred))
