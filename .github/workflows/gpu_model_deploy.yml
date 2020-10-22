@@ -26,6 +26,7 @@ jobs:
       - name: GPU machine turn on
         run: |
             sudo chmod 777 /var/run/docker.sock
+            sudo docker rmi $(docker images -a -q)
 
   faq-classifier:
     runs-on: [self-hosted, linux, x64]
@@ -97,7 +98,6 @@ jobs:
     runs-on: [self-hosted, linux, x64]
     needs: prepare_self-host_runner
     steps:
-      - uses: actions/checkout@v2
       - name: model_training
         env:
             repo_token: ${{ secrets.GITHUB_TOKEN }}
