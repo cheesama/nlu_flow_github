@@ -29,7 +29,7 @@ jobs:
 
   faq-classifier:
     runs-on: [self-hosted, linux, x64]
-    needs: turn_on_self-host_runner
+    needs: prepare_self-host_runner
     container: docker://dvcorg/cml-py3:latest
     steps:
       - uses: actions/checkout@v2
