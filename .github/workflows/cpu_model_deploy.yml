@@ -211,14 +211,14 @@ jobs:
             # Write your CML report
             cml-send-comment report.md
 
-      #- name: Push Docker image to GitHub Packages
-      #  uses: docker/build-push-action@v2
-      #  with:
-      #      username: ${{ github.actor }}
-      #      password: ${{ secrets.GITHUB_TOKEN }}
-      #      registry: docker.pkg.github.com
-      #      repository: cheesama/nlu_flow/faq_classifier
-      #      tag_with_ref: true
+      - name: Push Docker image to GitHub Packages
+        uses: docker/build-push-action@v1
+        with:
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+            registry: docker.pkg.github.com
+            repository: cheesama/nlu_flow/faq_classifier
+            tag_with_ref: true
        
       # Connect to Azure Container registry (ACR)
       - uses: azure/docker-login@v1
