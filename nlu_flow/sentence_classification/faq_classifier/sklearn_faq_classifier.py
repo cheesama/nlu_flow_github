@@ -6,6 +6,8 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.model_selection import GridSearchCV
 
+from imblearn.over_sampling import RandomOverSampler
+
 from tqdm import tqdm
 from pprint import pprint
 
@@ -71,10 +73,15 @@ def train_faq_classifier():
         utterances.append(normalize(data["question"]))
         labels.append(data["faq_intent"])
 
+    '''
     scenario_data = meta_db_client.get("nlu-intent-entity-utterances")
     for data in tqdm(random.choices(scenario_data, k=len(response_dict)), desc=f"collecting scenario data ... "):
         utterances.append(normalize(data["utterance"]))
         labels.append('시나리오')
+    '''
+
+    ros = RandomOverSampler(random_state=88)
+    utterances, labels = ros.fit_sample(utterances, labels)
     
     print(f"dataset num: {len(utterances)}")
 
