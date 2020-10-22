@@ -210,16 +210,16 @@ jobs:
             cd nlu_flow/sentence_classification/faq_classifier && pip install -r requirements.txt && python sklearn_faq_classifier.py && cp -r * ../../../
             # Write your CML report
             cml-send-comment report.md
-      - name: Push Docker image to GitHub Packages
-        uses: docker/build-push-action@v2
-        with:
-            username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
-            registry: docker.pkg.github.com
-            repository: cheesama/nlu_flow/faq_classifier
-            tag_with_ref: true
-            # docker login https://docker.pkg.github.com -u USERNAME --password-stdin
 
+      #- name: Push Docker image to GitHub Packages
+      #  uses: docker/build-push-action@v2
+      #  with:
+      #      username: ${{ github.actor }}
+      #      password: ${{ secrets.GITHUB_TOKEN }}
+      #      registry: docker.pkg.github.com
+      #      repository: cheesama/nlu_flow/faq_classifier
+      #      tag_with_ref: true
+       
       # Connect to Azure Container registry (ACR)
       - uses: azure/docker-login@v1
         with:
