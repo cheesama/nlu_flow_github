@@ -207,9 +207,8 @@ jobs:
             apt-get install -y python3-dev
             pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements_model.txt
             python setup.py install
-            cd nlu_flow/sentence_classification/faq_classifier/sklearn_rf && pip install -r requirements.txt && python sklearn_faq_classifier.py && cp -r * ../../../
+            cd nlu_flow/sentence_classification/faq_classifier/sklearn_rf && pip install -r requirements.txt && python sklearn_faq_classifier.py && cp -r * ../../../../
             # Write your CML report
-            ls -al
             cml-send-comment report.md
 
       #- name: Push Docker image to GitHub Packages
@@ -230,7 +229,8 @@ jobs:
 
       # Container build and push to a Azure Container registry (ACR)
       - run: |
-            docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }}
+            ls -al
+            docker build -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }} .
             docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }}
 
       - uses: azure/k8s-set-context@v1
