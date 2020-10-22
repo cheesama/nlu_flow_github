@@ -6,10 +6,11 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.model_selection import GridSearchCV
 
-from imblearn.over_sampling import RandomOverSampler
+from imblearn.over_sampling import RandomOverSampler, SMOTE
 
 from tqdm import tqdm
 from pprint import pprint
+from collections import Counter
 
 from nlu_flow.utils import meta_db_client
 from nlu_flow.preprocessor.text_preprocessor import normalize
@@ -80,17 +81,23 @@ def train_faq_classifier():
         labels.append('시나리오')
     '''
 
-    ros = RandomOverSampler(random_state=88)
-    utterances, labels = ros.fit_sample(utterances, labels)
-    
-    print(f"dataset num: {len(utterances)}")
+    vectorizer = TfidfVectorizer(analyzer="char_wb", ngram_range=(1,6))
+    utterances = vectorizer.fit_transform(utterances)
+
+    ros = RandomOverSampler(random_state=88, sampling_strategy='auto')
+    utterances, labels = ros.fit_resample(utterances, labels)
+    print('Resampled dataset shape %s' % Counter(labels))
+    print(f'dataset num: {utterances.getnnz()}')
 
     X_train, X_test, y_train, y_test = train_test_split(
         utterances, labels, random_state=88, test_size=0.1
     )
 
-    pipe = Pipeline(steps=[('vectorize', TfidfVectorizer(analyzer="char_wb", ngram_range=(1,6))), ('svc', SVC(probability=True))])
+    ## SVC 
+    '''
+    svc = Pipeline(steps=[('svc', SVC(probability=True))])
     print("faq classifier training(with SVC)")
+    svc.fit(X_train, y_train)
     
     # Parameter Grid
     param_grid = {'svc__C': [0.1, 1, 10, 100], 'svc__gamma': [1, 0.1, 0.01, 0.001, 0.00001, 10]}
@@ -105,8 +112,18 @@ def train_faq_classifier():
     print("Best Estimators:\n", clf_grid.best_estimator_)
     svc = clf_grid.best_estimator_()
 
-    print("model training done, validation reporting")
+    print("SVC model training done, validation reporting")
     y_pred = svc.predict(X_test)
+    print(classification_report(y_test, y_pred))
+    '''
+
+    ## RandomForest
+    rf = RandomForestClassifier(random_state=88, n_jobs=-1)
+    print("faq classifier training(with RandomForest)")
+    rf.fit(X_train, y_train)
+ 
+    print("RandomForest model training done, validation reporting")
+    y_pred = rf.predict(X_test)
     print(classification_report(y_test, y_pred))
 
     reportDict = {}
@@ -118,10 +135,17 @@ def train_faq_classifier():
         print("faq classification result\n", file=reportFile)
         print(reportDict, file=reportFile)
 
-    # save faq classifier model
+    ''''
+    # save faq classifier model(svc)
     with open("faq_classifier_model.svc", "wb") as f:
         dill.dump(svc, f)
         print("faq_classifier model saved : faq_classifier_model.svc")
+    '''
+
+    # save faq classifier model(rf)
+    with open("faq_classifier_model.rf", "wb") as f:
+        dill.dump(rf, f)
+        print("faq_classifier model saved : faq_classifier_model.rf")
 
     # save faq response dict
     with open("faq_response_dict.dill", "wb") as f:

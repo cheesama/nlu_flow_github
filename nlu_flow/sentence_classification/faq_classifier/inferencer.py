@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 from nlu_flow.preprocessor.text_preprocessor import normalize
 
@@ -10,7 +11,7 @@ is_ready = False
 #load faq_classifer_model
 model = None
 response_dict = None
-with open('./faq_classifier_model.svc', 'rb') as f:
+with open('./faq_classifier_model.rf', 'rb') as f:
     model = dill.load(f)
     print ('faq_classifier_model load success')
 
@@ -34,11 +35,14 @@ async def health():
 async def predict_faq(text: str, top_k=3):
     #name = model.predict([normalize(text, with_space=True)])[0]
     #confidence = model.predict_proba([normalize(text)])[0].max()
-    probs = model.predict_proba([normalize(text)])
+    vectorizer = TfidfVectorizer(analyzer="char_wb", ngram_range=(1,6))
+    feature =  vectorizer([normalize(text)])
+
+    probs = model.predict_proba(feature)
     result = sorted( zip( model.classes_, probs[0] ), key=lambda x:x[1] )[-top_k:]
     dict_result = []
     for each_result in result:
-        each_dict = {'faq_intent': each_result[0], 'confidence': each_result[1], 'classifier': 'faq_classifier_model.svc'}
+        each_dict = {'faq_intent': each_result[0], 'confidence': each_result[1], 'classifier': 'faq_classifier_model.rf'}
         each_dict.update(response_dict[each_result[0]])
         dict_result.append(each_dict)
         

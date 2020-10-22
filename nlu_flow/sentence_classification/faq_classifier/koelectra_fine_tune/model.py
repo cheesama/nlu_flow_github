@@ -1,18 +1,26 @@
 from torch import nn
 from torch.utils.data import DataLoader, random_split
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 
 from transformers import ElectraModel, ElectraTokenizer
 
 from nlu_flow.utils import meta_db_client
 
 from tqdm import tqdm
+from argparse import Namespace, ArgumentParser
 
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 
-import pytorch_lightning as pl, Trainer
+from pytorch_lightning import Trainer
+from pytorch_lightning.callbacks import ModelCheckpoint
+from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+import pytorch_lightning as pl
 
 import os
+import multiprocessing
+import random
 
 class FAQDataset(torch.utils.data.Dataset):
     def __init__(self):
@@ -53,21 +61,29 @@ class FAQDataset(torch.utils.data.Dataset):
                             self.utterances.append(target_utterance.replace(prev_value, post_value))
                             self.labels.append(data["faq_intent"])
 
-                        break
-
             self.utterances.append(data["question"])
             self.labels.append(data["faq_intent"])
 
+        '''
         scenario_data = meta_db_client.get("nlu-intent-entity-utterances")
-        for data in tqdm(scenario_data, desc=f"collecting scenario data ... "):
+        for data in tqdm(random.choices(scenario_data, k=len(self.utterances)), desc=f"collecting scenario data ... "):
             self.utterances.append(data["utterance"])
-            self.labels.append('시나리오')
+            self.labels.append('scenario')
+        '''
+
+        label_statistics = {}
 
         # organize label_dict
         for label in self.labels:
             self.label_idx[label] = len(self.label_idx)
-        for k,v in self.label_idx:
+            label_statistics[label] = label_statistics.get(label, 0) + 1
+
+        for k,v in self.label_idx.items():
             self.idx_label[v] = k
+
+        label_staistics = {k: v for k, v in sorted(label_statistics.items(), key=lambda item: item[1])}
+        for k, v in label_statistics.items():
+            print (f'{k}\t{v}')
 
     def tokenize(self, text, pad=True, max_length=20):
         tokens = self.tokenizer.encode(text)     
@@ -79,7 +95,7 @@ class FAQDataset(torch.utils.data.Dataset):
     def __getitem__(self, i):
         tokens = self.tokenize(self.utterances[i])
         tokens = torch.LongTensor(tokens)
-        label = torch.LongTensor(self.label_idx[self.labels[i]])
+        label = torch.tensor(self.label_idx[self.labels[i]])
 
         return tokens, label
 
@@ -87,21 +103,24 @@ class FAQDataset(torch.utils.data.Dataset):
         return len(self.utterances)
 
 class KoelectraFAQClassifier(pl.LightningModule):
-    def __init__(self, lr=1e-3, batch_size=64):
+    def __init__(self, hparams):
         super().__init__()
         self.embedding_net = ElectraModel.from_pretrained("monologg/koelectra-small-v2-discriminator")
-        
-        self.dataset = FAQDataset()
-        self.feature_layer = nn.Linear(self.embedding_net.config.hidden_size, len(self.dataset.self.label_idx))
+        self.loss_fn = nn.CrossEntropyLoss()
 
-        self.lr = lr
-        self.batch_size = batch_size
+        self.hparams = hparams
+        self.lr = self.hparams.lr
+        self.batch_size = self.hparams.batch_size
+
+        self.dataset = FAQDataset()
+        print(f'total dataset num:{len(self.dataset)}')
+        self.feature_layer = nn.Linear(self.embedding_net.config.hidden_size, len(self.dataset.label_idx))
 
     def train_dataloader(self):
-        return DataLoader(self.dataset, batch_size=self.batch_size)
+        return DataLoader(self.dataset, batch_size=self.batch_size, num_workers=multiprocessing.cpu_count())
 
     def forward(self, x):
-        x = self.embedding_net(x)[0][0] # tuple - first token
+        x = self.embedding_net(x)[0][:,0,:] # tuple - first token
         x = self.feature_layer(x)
 
         return x
@@ -110,26 +129,31 @@ class KoelectraFAQClassifier(pl.LightningModule):
         tokens = self.dataset.tokenize(text)
         pred = self.forward(torch.LongTensor(tokens).unsqueeze(0))
 
-        return pred.argmax(1)[0], self.dataset.idx_label[pred.argmax(1)[0]]
+        return pred.argmax(1)[0].item(), self.dataset.idx_label[pred.argmax(1)[0].item()]
 
     def training_step(self, batch, batch_idx):
         tokens, label = batch
 
         pred = self.forward(tokens)
-        loss = F.cross_entropy(pred, label)
+        loss = self.loss_fn(pred, label)
         self.log('train_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         
         return loss
 
     def configure_optimizers(self):
         optimizer = torch.optim.Adam(self.parameters(), lr=self.lr)
-        return optimizer
+        scheduler = ReduceLROnPlateau(optimizer, factor=0.5, patience=1)
+        return {'optimizer': optimizer, 'lr_scheduler': scheduler, 'monitor':'train_loss'}
 
-model = KoelectraFAQClassifier()
+if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument('--lr', default=1e-4)
+    parser.add_argument('--batch_size', default=128)
+    args = parser.parse_args()
+
+    model = KoelectraFAQClassifier(args)
+
+    checkpoint_callback = ModelCheckpoint(monitor='train_loss', save_top_k=1, mode='min')
   
-trainer = Trainer()
-trainer.fit(model)
-    
-        
-
-        
+    trainer = Trainer(callbacks=[EarlyStopping(monitor='train_loss')], checkpoint_callback=checkpoint_callback)
+    trainer.fit(model)
