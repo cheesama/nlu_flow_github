@@ -142,6 +142,8 @@ def train_faq_classifier():
         print("faq_classifier model saved : faq_classifier_model.svc")
     '''
 
+    rf = Pipeline(steps=[('vectorize', vectorizer), ('rf', rf)])
+    
     # save faq classifier model(rf)
     with open("faq_classifier_model.rf", "wb") as f:
         dill.dump(rf, f)
