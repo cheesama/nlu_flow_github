@@ -27,6 +27,7 @@ jobs:
         run: |
             sudo chmod 777 /var/run/docker.sock
             sudo docker rmi -f $(docker images -a -q)
+            sudo chmod -R 777 ~/actions-runner
 
   faq-classifier:
     runs-on: [self-hosted, linux, x64]
