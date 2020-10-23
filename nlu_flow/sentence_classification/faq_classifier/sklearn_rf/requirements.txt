@@ -1,5 +1,6 @@
 fastapi
 uvicorn
 requests
-
+numpy
 imblearn
+nlpaug

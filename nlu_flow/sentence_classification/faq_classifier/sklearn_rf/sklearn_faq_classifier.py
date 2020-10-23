@@ -6,7 +6,8 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.model_selection import GridSearchCV
 
-from imblearn.over_sampling import RandomOverSampler, RandomUnderSampler, SMOTE
+from imblearn.over_sampling import RandomOverSampler, SMOTE
+from imblearn.under_sampling import RandomUnderSampler
 
 from tqdm import tqdm
 from pprint import pprint
