@@ -83,14 +83,18 @@ def train_faq_classifier():
     '''
 
     vectorizer = TfidfVectorizer(analyzer="char_wb", ngram_range=(1,6))
+    
+    '''
     utterances = vectorizer.fit_transform(utterances)
-
     ros = RandomOverSampler(random_state=88, sampling_strategy=0.5)
     utterances, labels = ros.fit_resample(utterances, labels)
     ros = RandomUnderSampler(random_state=88, sampling_strategy=0.5)
     utterances, labels = ros.fit_resample(utterances, labels)
-    print('Resampled dataset shape %s' % Counter(labels))
     print(f'dataset num: {utterances.getnnz()}')
+    '''
+    
+    print('Resampled dataset shape %s' % Counter(labels))
+    print(f'dataset num: {len(utterances)}')
     
     X_train, X_test, y_train, y_test = train_test_split(
         utterances, labels, random_state=88, test_size=0.1
@@ -122,7 +126,7 @@ def train_faq_classifier():
 
     ## RandomForest
     rf = RandomForestClassifier(n_estimators=64, random_state=88, n_jobs=-1)
-    #rf = make_pipeline(vectorizer, rf)
+    rf = make_pipeline(vectorizer, rf)
     print("faq classifier training(with RandomForest)")
     rf.fit(X_train, y_train)
  
@@ -146,7 +150,7 @@ def train_faq_classifier():
         print("faq_classifier model saved : faq_classifier_model.svc")
     '''
 
-    rf = make_pipeline(vectorizer, rf)
+    #rf = make_pipeline(vectorizer, rf)
     
     # save faq classifier model(rf)
     with open("faq_classifier_model.rf", "wb") as f:
