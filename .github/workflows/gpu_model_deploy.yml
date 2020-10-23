@@ -26,8 +26,7 @@ jobs:
       - name: GPU machine turn on
         run: |
             sudo chmod 777 /var/run/docker.sock
-            sudo docker rmi -f $(docker images -a -q)
-  
+            
   chitchat-response-generator:
     runs-on: [self-hosted, linux, x64]
     needs: prepare_self-host_runner
