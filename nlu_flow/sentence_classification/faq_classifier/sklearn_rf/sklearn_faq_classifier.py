@@ -118,7 +118,7 @@ def train_faq_classifier():
     '''
 
     ## RandomForest
-    rf = RandomForestClassifier(random_state=88, n_jobs=-1)
+    rf = RandomForestClassifier(n_estimators=200, random_state=88, n_jobs=-1)
     print("faq classifier training(with RandomForest)")
     rf.fit(X_train, y_train)
  

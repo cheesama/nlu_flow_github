@@ -98,7 +98,7 @@ jobs:
     runs-on: [self-hosted, linux, x64]
     needs: faq-classifier
     steps:
-      #- uses: actions/checkout@v2
+      - uses: actions/checkout@v2
       - name: model_training
         env:
             repo_token: ${{ secrets.GITHUB_TOKEN }}
