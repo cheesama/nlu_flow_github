@@ -6,7 +6,7 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.model_selection import GridSearchCV
 
-from imblearn.over_sampling import RandomOverSampler, SMOTE
+from imblearn.over_sampling import RandomOverSampler, RandomUnderSampler, SMOTE
 
 from tqdm import tqdm
 from pprint import pprint
@@ -84,11 +84,13 @@ def train_faq_classifier():
     vectorizer = TfidfVectorizer(analyzer="char_wb", ngram_range=(1,6))
     utterances = vectorizer.fit_transform(utterances)
 
-    ros = RandomOverSampler(random_state=88, sampling_strategy='auto')
+    ros = RandomOverSampler(random_state=88, sampling_strategy=0.5)
+    utterances, labels = ros.fit_resample(utterances, labels)
+    ros = RandomUnderSampler(random_state=88, sampling_strategy=0.5)
     utterances, labels = ros.fit_resample(utterances, labels)
     print('Resampled dataset shape %s' % Counter(labels))
     print(f'dataset num: {utterances.getnnz()}')
-
+    
     X_train, X_test, y_train, y_test = train_test_split(
         utterances, labels, random_state=88, test_size=0.1
     )
@@ -118,7 +120,8 @@ def train_faq_classifier():
     '''
 
     ## RandomForest
-    rf = RandomForestClassifier(n_estimators=128, random_state=88, n_jobs=-1)
+    rf = RandomForestClassifier(n_estimators=64, random_state=88, n_jobs=-1)
+    #rf = make_pipeline(vectorizer, rf)
     print("faq classifier training(with RandomForest)")
     rf.fit(X_train, y_train)
  
