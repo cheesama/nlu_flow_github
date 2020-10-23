@@ -36,7 +36,7 @@ async def predict_faq(text: str, top_k=3):
     #name = model.predict([normalize(text, with_space=True)])[0]
     #confidence = model.predict_proba([normalize(text)])[0].max()
     probs = model.predict_proba([text])
-    result = sorted( zip( model.classes_, probs[0] ), key=lambda x:x[1] )[-top_k:]
+    result = sorted( zip( model.classes_, probs[0] ), key=lambda x:x[1], reverse=True )[-top_k:]
     dict_result = []
     for each_result in result:
         each_dict = {'faq_intent': each_result[0], 'confidence': each_result[1], 'classifier': 'faq_classifier_model.rf'}

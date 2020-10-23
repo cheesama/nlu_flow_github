@@ -7,7 +7,7 @@ import dill
 
 model = None
 response_dict = None
-with open('./faq_classifier_model.svc', 'rb') as f:
+with open('./faq_classifier_model.rf', 'rb') as f:
     model = dill.load(f)
     print ('faq_classifier_model load success')
     print (model.classes_)

@@ -96,7 +96,7 @@ jobs:
 
   chitchat-response-generator:
     runs-on: [self-hosted, linux, x64]
-    needs: prepare_self-host_runner
+    needs: faq-classifier
     steps:
       #- uses: actions/checkout@v2
       - name: model_training
