@@ -15,7 +15,6 @@ WORKDIR /workspace/
 COPY inferencer.py /workspace/inferencer.py
 COPY model.py /workspace/model.py
 COPY koelectra_faq_classifier.ckpt /workspace/koelectra_faq_classifier.ckpt
-COPY faq_response_dict.dill /workspace/faq_response_dict.dill
 
 EXPOSE  8000
 CMD ["uvicorn", "inferencer:app", "--reload", "--host=0.0.0.0", "--port=8000"]
