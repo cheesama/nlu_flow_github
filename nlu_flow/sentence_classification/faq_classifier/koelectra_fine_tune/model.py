@@ -125,11 +125,16 @@ class KoelectraFAQClassifier(pl.LightningModule):
 
         return x
 
-    def inference(self, text):
+    def inference(self, text, top_k=3):
         tokens = self.dataset.tokenize(text)
         pred = self.forward(torch.LongTensor(tokens).unsqueeze(0))
 
-        return pred.argmax(1)[0].item(), self.dataset.idx_label[pred.argmax(1)[0].item()]
+        topk = torch.topk(pred, top_k)[1].numpy()
+        labels = []
+        for each_pred in topk:
+            labels.append(self.dataset.idx_label[each_pred])
+
+        return [{'confidence': k, 'faq_intent': label} for k, label in zip(topk, labels)]
 
     def training_step(self, batch, batch_idx):
         tokens, label = batch
@@ -153,7 +158,7 @@ if __name__ == '__main__':
 
     model = KoelectraFAQClassifier(args)
 
-    checkpoint_callback = ModelCheckpoint(monitor='train_loss', save_top_k=1, mode='min')
+    checkpoint_callback = ModelCheckpoint(monitor='train_loss', save_top_k=1, mode='min', filepath='koelectra_faq_classifier')
   
     trainer = Trainer(callbacks=[EarlyStopping(monitor='train_loss')], checkpoint_callback=checkpoint_callback)
     trainer.fit(model)

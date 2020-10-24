@@ -95,7 +95,6 @@ jobs:
   faq-classifier:
     runs-on: [self-hosted, linux, x64]
     needs: chitchat-response-generator
-    container: docker://dvcorg/cml-py3:latest
     steps:
       - uses: actions/checkout@v2
       - name: model_training
@@ -107,10 +106,8 @@ jobs:
             apt-get install -y python3-dev
             pip install --upgrade pip && pip install -r requirements.txt && pip install -r requirements_model.txt
             python setup.py install
-            cd nlu_flow/sentence_classification/faq_classifier/sklearn_rf && pip install -r requirements.txt && python sklearn_faq_classifier.py && cp -r * ../../../../
-            # Write your CML report
-            cml-send-comment report.md
-
+            cd nlu_flow/sentence_classification/faq_classifier/koelectra_fine_tune && pip install -r requirements.txt && python model.py && cp -r * ../../../../
+            
       - name: Push Docker image to GitHub Packages
         uses: docker/build-push-action@v1
         with:
