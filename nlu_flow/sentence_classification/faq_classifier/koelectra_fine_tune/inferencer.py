@@ -11,7 +11,8 @@ is_ready = False
 model = None
 model = KoelectraFAQClassifier.load_from_checkpoint('koelectra_faq_classifier.ckpt')
 
-
+if model is not None:
+    is_ready = True
 
 #endpoints
 @app.get("/")
