@@ -105,6 +105,7 @@ jobs:
             pip3 install --upgrade pip && pip3 install -r requirements.txt && pip3 install -r requirements_model.txt
             python3 setup.py install
             cd nlu_flow/sentence_classification/faq_classifier/koelectra_fine_tune && rm -rf *.ckpt && pip3 install -r requirements.txt && python3 model.py && cp -r * ../../../../
+            ls -al
             
       - name: Push Docker image to GitHub Packages
         uses: docker/build-push-action@v1
