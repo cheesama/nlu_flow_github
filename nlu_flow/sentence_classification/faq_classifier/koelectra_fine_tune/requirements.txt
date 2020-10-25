@@ -1,3 +1,8 @@
+fastapi
+uvicorn
+requests
+numpy
+
 torch
 transformers
 pytorch-lightning

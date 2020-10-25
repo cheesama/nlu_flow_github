@@ -69,12 +69,15 @@ def get(url: str, max_num=-1):
 
 def put(url, id, data):
     result = request_to_server('put', url=url + '/' + str(id), data=data)
+    return result
 
 def post(url, data):
     result = request_to_server('post', url=url, data=data)
+    return result 
 
 def delete(url, id):
     result = request_to_server('delete', url=url + '/' + str(id))
+    return result
 
 #def get_regexs():
 #    return get('regexes')
