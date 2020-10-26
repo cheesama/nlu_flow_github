@@ -17,6 +17,9 @@ COPY inferencer.py /workspace/inferencer.py
 COPY model.py /workspace/model.py
 COPY koelectra_faq_classifier-v0.ckpt /workspace/koelectra_faq_classifier.ckpt
 
+ARG META_ENDPOINT
+ENV META_ENDPOINT=$META_ENDPOINT
+
 EXPOSE  8000
 CMD ["uvicorn", "inferencer:app", "--reload", "--host=0.0.0.0", "--port=8000"]
 
