@@ -18,7 +18,7 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import pytorch_lightning as pl
 
-import os
+import os, sys
 import multiprocessing
 import random
 
@@ -158,7 +158,11 @@ if __name__ == '__main__':
 
     model = KoelectraFAQClassifier(args)
 
-    checkpoint_callback = ModelCheckpoint(monitor='train_loss', save_top_k=1, mode='min', filepath='koelectra_faq_classifier.ckpt')
+    checkpoint_callback = ModelCheckpoint(monitor='train_loss', save_top_k=1, mode='min', filepath='koelectra_faq_classifier')
   
     trainer = Trainer(callbacks=[EarlyStopping(monitor='train_loss')], checkpoint_callback=checkpoint_callback)
     trainer.fit(model)
+
+    #rename output ckpt name
+    if os.path.isfile('koelectra_faq_classifier-v0.ckpt'):
+        os.rename('koelectra_faq_classifier-v0.ckpt', 'koelectra_faq_classifier.ckpt')
