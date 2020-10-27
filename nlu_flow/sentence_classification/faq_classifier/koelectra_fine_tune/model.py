@@ -132,7 +132,7 @@ class KoelectraFAQClassifier(pl.LightningModule):
         topk = torch.topk(pred, top_k)[1].numpy()[0]
         labels = []
         for each_pred in topk:
-            labels.append(self.dataset.idx_label[each_pred])
+            labels.append(self.dataset.idx_label[int(each_pred)])
 
         return [{'confidence': k, 'faq_intent': label} for k, label in zip(topk, labels)]
 
