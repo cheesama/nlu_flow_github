@@ -126,6 +126,7 @@ jobs:
       # Container build and push to a Azure Container registry (ACR)
       - run: |
             ls -al
+            echo ::set-env name=META_ENDPOINT::${{ secrets.META_ENDPOINT }}
             docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }} --build-arg META_ENDPOINT
             docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }}
 
