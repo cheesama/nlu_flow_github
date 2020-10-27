@@ -124,9 +124,12 @@ jobs:
             password: ${{ secrets.REGISTRY_PASSWORD }}
 
       # Container build and push to a Azure Container registry (ACR)
-      - run: |
+      - name: dockerize image to ACR
+        env:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
+        run: |
             ls -al
-            echo ::set-env name=META_ENDPOINT::${{ secrets.META_ENDPOINT }}
             docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }} --build-arg META_ENDPOINT
             docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }}
 
