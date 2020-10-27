@@ -158,7 +158,7 @@ if __name__ == '__main__':
 
     model = KoelectraFAQClassifier(args)
 
-    checkpoint_callback = ModelCheckpoint(monitor='train_loss', save_top_k=1, mode='min', filepath='koelectra_faq_classifier')
+    checkpoint_callback = ModelCheckpoint(monitor='train_loss', save_top_k=1, mode='min', filepath='koelectra_faq_classifier.ckpt')
   
     trainer = Trainer(callbacks=[EarlyStopping(monitor='train_loss')], checkpoint_callback=checkpoint_callback)
     trainer.fit(model)
