@@ -122,19 +122,23 @@ class KoelectraFAQClassifier(pl.LightningModule):
     def forward(self, x):
         x = self.embedding_net(x)[0][:,0,:] # tuple - first token
         x = self.feature_layer(x)
+        x = F.softmax(x, dim=1)
 
         return x
 
     def inference(self, text, top_k=3):
-        tokens = self.dataset.tokenize(text)
-        pred = self.forward(torch.LongTensor(tokens).unsqueeze(0))
+        with torch.no_grad():
+            tokens = self.dataset.tokenize(text)
+            pred = self.forward(torch.LongTensor(tokens).unsqueeze(0))
 
-        topk = list(torch.topk(pred, top_k)[1].numpy()[0])
-        labels = []
-        for each_pred in topk:
-            labels.append(self.dataset.idx_label[int(each_pred)])
+            confidences, indices = torch.topk(pred, top_k)
+            confidences = list(confidences.numpy()[0])
+            indices = list(indices.numpy()[0])
 
-        return [{'confidence': k, 'faq_intent': label} for k, label in zip(topk, labels)]
+            result = [{'confidence': float(confidence), 'faq_intent': self.dataset.idx_label[int(index)]} for confidence, index in zip(confidences, indices)]
+            print (result)
+
+            return result
 
     def training_step(self, batch, batch_idx):
         tokens, label = batch

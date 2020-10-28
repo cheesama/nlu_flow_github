@@ -25,5 +25,5 @@ async def health():
 
 @app.post("/predict")
 async def predict_faq(text: str, top_k=3):
-    return model.inference(text, top_k)
+    return model.inference(text, int(top_k))
 
