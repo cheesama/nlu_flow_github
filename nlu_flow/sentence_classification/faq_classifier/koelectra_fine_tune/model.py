@@ -129,7 +129,7 @@ class KoelectraFAQClassifier(pl.LightningModule):
         tokens = self.dataset.tokenize(text)
         pred = self.forward(torch.LongTensor(tokens).unsqueeze(0))
 
-        topk = torch.topk(pred, top_k)[1].numpy()[0]
+        topk = list(torch.topk(pred, top_k)[1].numpy()[0])
         labels = []
         for each_pred in topk:
             labels.append(self.dataset.idx_label[int(each_pred)])
