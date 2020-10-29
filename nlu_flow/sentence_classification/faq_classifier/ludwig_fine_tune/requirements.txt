@@ -5,5 +5,5 @@ numpy
 scikit-learn
 dill
 
-tensorflow-gpu
-ludwig
+tensorflow
+ludwig[serve]
