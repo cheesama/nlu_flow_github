@@ -56,4 +56,4 @@ for data in tqdm(random.choices(scenario_data, k=len(self.utterances)), desc=f"c
 
 os.system('rm -rf results')
 os.system('ludwig experiment --dataset faq_dataset.tsv --config_file config.yml')
-os.system('ludwig evaluate --dataset golden_set.tsv --model_path results/experiment_run/model/')
+#os.system('ludwig evaluate --dataset golden_set.tsv --model_path results/experiment_run/model/')

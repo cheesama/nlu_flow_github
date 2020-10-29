@@ -158,8 +158,23 @@ jobs:
             SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
             SLACK_MESSAGE: ${{ env.REPORT }}
 
-  shutdown_self-host_runner:
+  ludwig-faq-fine-tuner:
+    runs-on: [self-hosted, linux, x64]
     needs: faq-classifier
+    steps:
+      - uses: actions/checkout@v2
+      - name: model_training
+        env:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
+        run: |
+            pip3 install --upgrade pip && pip3 install -r requirements.txt && pip3 install -r requirements_model.txt
+            python3 setup.py install
+            cd nlu_flow/sentence_classification/faq_classifier/ludwig_fine_tune && pip3 install -r requirements.txt && python3 train_val.py && cp -r * ../../../../
+            ls -al
+      
+  shutdown_self-host_runner:
+    needs: ludwig-faq-fine-tuner
     runs-on: ubuntu-latest
     steps:
       - name: Azure Login
