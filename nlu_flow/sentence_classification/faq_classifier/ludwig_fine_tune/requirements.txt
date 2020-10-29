@@ -5,4 +5,5 @@ numpy
 scikit-learn
 dill
 
+tensorflow-gpu
 ludwig
