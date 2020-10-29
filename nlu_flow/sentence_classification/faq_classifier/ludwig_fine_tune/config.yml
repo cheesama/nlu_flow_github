@@ -3,7 +3,18 @@ input_features:
         name: text
         type: text
         level: word
-        encoder: gpt2
+
+        #encoder type
+        #'stacked_cnn': StackedCNN,
+        #'parallel_cnn': ParallelCNN,
+        #'stacked_parallel_cnn': StackedParallelCNN,
+        #'rnn': StackedRNN,
+        #'cnnrnn': StackedCNNRNN,
+        #'transformer': StackedTransformer,                                                                
+        #'embed': SequenceEmbedEncoder,
+        #'passthrough': SequencePassthroughEncoder
+        encoder: embed
+
 output_features:
     -
         name: class
