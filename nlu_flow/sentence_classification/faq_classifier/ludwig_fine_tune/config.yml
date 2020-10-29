@@ -1,0 +1,10 @@
+input_features:
+    -
+        name: text
+        type: text
+        level: word
+        encoder: gpt2
+output_features:
+    -
+        name: class
+        type: category
