@@ -4,6 +4,7 @@ requests
 pandas
 dill
 
+setuptools>=41.0.0
 numpy==1.18.5
 tensorflow
 ludwig[serve]
