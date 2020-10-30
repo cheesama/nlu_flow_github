@@ -1,6 +1,7 @@
 from nlu_flow.utils import meta_db_client
 from tqdm import tqdm
 
+import dill
 import os, sys
 import random
 
@@ -19,6 +20,7 @@ for data in tqdm(
 
     synonyms.append([each_synonym.get("synonym") for each_synonym in data.get("meta_synonyms")] + [data.get("Entity_Value")])
 
+faq_response_dict = {}
 faq_data = meta_db_client.get("nlu-faq-questions")
 for data in tqdm(faq_data, desc=f"collecting faq data ... "):
     if data["faq_intent"] is None or len(data["faq_intent"]) < 2:
@@ -26,6 +28,7 @@ for data in tqdm(faq_data, desc=f"collecting faq data ... "):
         continue
 
     target_utterance = data["question"]
+    faq_response_dict[data['faq_intent']] = data['prompt_id']
 
     # check synonym is included
     for synonym_list in synonyms:
@@ -47,6 +50,9 @@ with open('faq_dataset.tsv', 'w') as faqData:
         faqData.write(labels[i])
         faqData.write('\n')
 
+with open('faq_response_dict.dill', 'wb') as responseFile:
+    dill.dump(faq_response_dict, responseFile)
+
 '''
 scenario_data = meta_db_client.get("nlu-intent-entity-utterances")
 for data in tqdm(random.choices(scenario_data, k=len(self.utterances)), desc=f"collecting scenario data ... "):
@@ -56,4 +62,4 @@ for data in tqdm(random.choices(scenario_data, k=len(self.utterances)), desc=f"c
 
 os.system('rm -rf results')
 os.system('ludwig experiment --dataset faq_dataset.tsv --config_file config.yml')
-#os.system('ludwig evaluate --dataset golden_set.tsv --model_path results/experiment_run/model/')
+os.system('ludwig evaluate --dataset golden_set.tsv --model_path results/experiment_run/model/')

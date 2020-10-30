@@ -13,8 +13,7 @@ RUN buildDeps='gcc libc6-dev make' \
 
 WORKDIR /workspace/
 COPY inferencer.py /workspace/inferencer.py
-COPY model.py /workspace/model.py
-COPY koelectra_faq_classifier.ckpt /workspace/koelectra_faq_classifier.ckpt
+COPY results /workspace/results
 
 ARG META_ENDPOINT
 ENV META_ENDPOINT=$META_ENDPOINT

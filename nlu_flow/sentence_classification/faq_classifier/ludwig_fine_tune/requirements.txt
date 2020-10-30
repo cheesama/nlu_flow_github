@@ -2,8 +2,7 @@ fastapi
 uvicorn
 requests
 numpy
-scikit-learn
+pandas
 dill
 
-tensorflow
 ludwig[serve]
