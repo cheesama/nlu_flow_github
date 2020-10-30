@@ -4,5 +4,6 @@ requests
 pandas
 dill
 
+numpy==1.18.5
 tensorflow
 ludwig[serve]
