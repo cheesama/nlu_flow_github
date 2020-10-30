@@ -14,6 +14,7 @@ RUN buildDeps='gcc libc6-dev make' \
 WORKDIR /workspace/
 COPY inferencer.py /workspace/inferencer.py
 COPY results /workspace/results
+COPY faq_response_dict.dill /workspace/faq_response_dict.dill
 
 ARG META_ENDPOINT
 ENV META_ENDPOINT=$META_ENDPOINT
