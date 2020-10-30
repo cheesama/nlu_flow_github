@@ -4,6 +4,7 @@ from tqdm import tqdm
 import dill
 import os, sys
 import random
+import json
 
 utterances = []
 labels = []
@@ -63,3 +64,10 @@ for data in tqdm(random.choices(scenario_data, k=len(self.utterances)), desc=f"c
 os.system('rm -rf results')
 os.system('ludwig experiment --dataset faq_dataset.tsv --config_file config.yml')
 os.system('ludwig evaluate --dataset golden_set.tsv --model_path results/experiment_run/model/')
+
+#write result to file
+with open('results/experiment_run/test_statistics.json') as f:
+    test_result = json.load(f)
+
+    with open('report.md', 'w') as reportFile:
+        json.dump(test_result['class']['overall_stats'], reportFile, intent=4)
