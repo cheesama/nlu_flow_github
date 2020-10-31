@@ -464,13 +464,6 @@ jobs:
             tag_with_ref: true
             # docker login https://docker.pkg.github.com -u USERNAME --password-stdin
 
-      # Connect to Azure Container registry (ACR)
-      - uses: azure/docker-login@v1
-        with:
-            login-server: ${{ secrets.REGISTRY_NAME }}.azurecr.io
-            username: ${{ secrets.REGISTRY_USERNAME }}
-            password: ${{ secrets.REGISTRY_PASSWORD }}
-
       # Container build and push to a Azure Container registry (ACR)
       - name: dockerize image to ACR
         env:

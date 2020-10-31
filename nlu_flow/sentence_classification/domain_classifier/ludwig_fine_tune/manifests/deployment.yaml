@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: domain-classifier
+  name: domain-classifier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: domain-classifier
+  template:
+    metadata:
+      labels:
+        app: domain-classifier
+    spec:
+      containers:
+      - image: acrcommbot.azurecr.io/domain_classifier
+        name: domain-classifier
+        ports:
+        - containerPort: 8000
+        resources: {}
