@@ -21,7 +21,10 @@ for data in tqdm(
 
     synonyms.append([each_synonym.get("synonym") for each_synonym in data.get("meta_synonyms")] + [data.get("Entity_Value")])
 
-faq_response_dict = {}
+total_scenario_utter_num  = 0
+total_OOD_utter_num = 0
+
+## faq domain
 faq_data = meta_db_client.get("nlu-faq-questions")
 for data in tqdm(faq_data, desc=f"collecting faq data ... "):
     if data["faq_intent"] is None or len(data["faq_intent"]) < 2:
@@ -29,7 +32,6 @@ for data in tqdm(faq_data, desc=f"collecting faq data ... "):
         continue
 
     target_utterance = data["question"]
-    faq_response_dict[data['faq_intent']] = data['prompt_id']
 
     # check synonym is included
     for synonym_list in synonyms:
@@ -39,31 +41,59 @@ for data in tqdm(faq_data, desc=f"collecting faq data ... "):
                     if i == j:
                         continue
                     utterances.append(target_utterance.replace(prev_value, post_value))
-                    labels.append(data["faq_intent"])
+                    labels.append("faq")
 
+## scenario domain
+scenario_data = meta_db_client.get("nlu-intent-entity-utterances")
+for data in tqdm(scenario_data, desc=f"collecting table data : nlu-intent-entity-utterances"):
+    if type(data) != dict:
+        print(f"check data type : {data}")
+        continue
 
-with open('faq_dataset.tsv', 'w') as faqData:
-    faqData.write('text\tclass\n')
+    total_scenario_utter_num += 1
+
+    if "faq" in data["intent_id"]["Intent_ID"].lower():
+        utterances.append(data["utterance"])
+        labels.append("faq")
+    elif data["intent_id"]["Intent_ID"] == "intent_OOD":
+        utterances.append(data["utterance"])
+        labels.append("out_of_domain")
+        total_OOD_utter_num += 1
+    else:
+        utterances.append(data["utterance"])
+        labels.append("scenario")
+
+## out of domain
+slang_training_data = meta_db_client.get("nlu-slang-trainings", max_num=total_scenario_utter_num)
+for i, data in tqdm(enumerate(slang_training_data), desc=f"collecting table data : nlu-slang-trainings ...",):
+    if i > total_scenario_utter_num:
+        break
+
+    if type(data) != dict:
+        print (f'check data type: {data}')
+        continue
+
+    utterances.append(data["utterance"])
+    labels.append("out_of_domain")
+    total_OOD_utter_num += 1
+
+chitchat_data = meta_db_client.get("nlu-chitchat-utterances")
+for data in tqdm(chitchat_data, desc=f"collecting table data : nlu-chitchat-utterances"):
+    utterances.append(data["utterance"])
+    labels.append("out_of_domain")
+    total_OOD_utter_num += 1
+
+with open('domain_dataset.tsv', 'w') as domainData:
+    domainData.write('text\tclass\n')
     
     for i, utter in enumerate(utterances):
-        faqData.write(utter.strip())
-        faqData.write('\t')
-        faqData.write(labels[i])
-        faqData.write('\n')
-
-with open('faq_response_dict.dill', 'wb') as responseFile:
-    dill.dump(faq_response_dict, responseFile)
-
-'''
-scenario_data = meta_db_client.get("nlu-intent-entity-utterances")
-for data in tqdm(random.choices(scenario_data, k=len(self.utterances)), desc=f"collecting scenario data ... "):
-    self.utterances.append(data["utterance"])
-    self.labels.append('scenario')
-'''
+        domainData.write(utter.strip())
+        domainData.write('\t')
+        domainData.write(labels[i])
+        domainData.write('\n')
 
 os.system('rm -rf results')
-os.system('ludwig experiment --dataset faq_dataset.tsv --config_file config.yml')
-#os.system('ludwig evaluate --dataset golden_set.tsv --model_path results/experiment_run/model/')
+os.system('ludwig experiment --dataset domain_dataset.tsv --config_file config.yml')
 
 #write result to file
 with open('results/experiment_run/test_statistics.json') as f:
