@@ -17,7 +17,7 @@ jobs:
         uses: rtCamp/action-slack-notify@master
         env:
             SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-            SLACK_MESSAGE: GPU machine turned on for training chitchat-response-generator
+            SLACK_MESSAGE: GPU machine turned on for training deep learning models
 
   prepare_self-host_runner:
     runs-on: [self-hosted, linux, x64]
@@ -28,6 +28,7 @@ jobs:
             sudo chmod 777 /var/run/docker.sock
             sudo chmod 777 -R ~/actions-runner
             sudo chmod 777 -R /usr/local/
+            docker rmi -f $(docker images -a -q)
 
   domain-classifier:
     runs-on: [self-hosted, linux, x64]
@@ -87,7 +88,7 @@ jobs:
 
   chitchat-response-generator:
     runs-on: [self-hosted, linux, x64]
-    needs: domain-classifier
+    needs: prepare_self-host_runner
     steps:
       - uses: actions/checkout@v2
       - name: model_training
@@ -106,15 +107,6 @@ jobs:
             pip3 install --user git+http://github.com/SKT-AI/KoGPT2 && cd KoGPT2-chatbot && \
             CUDA_VISIBLE_DEVICES=0 python train_torch.py --gpus 1 --train --max_epochs 3 && \
             cd .. && pwd && cp -r * ../../../../ && pwd && ls
-
-      - name: Push Docker image to GitHub Packages
-        uses: docker/build-push-action@v1
-        with:
-            username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
-            registry: docker.pkg.github.com
-            repository: cheesama/nlu_flow/chitchat-response-generator
-            tag_with_ref: true
 
       # Connect to Azure Container registry (ACR)
       - uses: azure/docker-login@v1
@@ -150,7 +142,7 @@ jobs:
             SLACK_MESSAGE: chitchat-response-generator training & deploy done
     
   shutdown_self-host_runner:
-    needs: chitchat-response-generator
+    needs: [chitchat-response-generator, domain-classifier]
     runs-on: ubuntu-latest
     steps:
       - name: Azure Login

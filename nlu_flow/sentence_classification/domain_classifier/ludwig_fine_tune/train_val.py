@@ -6,6 +6,9 @@ import os, sys
 import random
 import json
 
+import tensorflow as tf
+tf.debugging.set_log_device_placement(True)
+
 utterances = []
 labels = []
 
