@@ -149,7 +149,7 @@ jobs:
             SLACK_MESSAGE: ${{ env.REPORT }}
     
   shutdown_self-host_runner:
-    needs: chitchat-response-generator
+    needs: domain-classifier
     runs-on: ubuntu-latest
     steps:
       - name: Azure Login
