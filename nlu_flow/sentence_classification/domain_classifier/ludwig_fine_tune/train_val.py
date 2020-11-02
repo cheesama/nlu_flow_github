@@ -100,5 +100,5 @@ with open('results/experiment_run/test_statistics.json') as f:
     test_result = json.load(f)
 
     with open('report.md', 'w') as reportFile:
-        reportFile.write('faq classification test result\n')
+        reportFile.write('domain classification test result\n')
         json.dump(test_result['class']['overall_stats'], reportFile, indent=4)
