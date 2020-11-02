@@ -85,7 +85,7 @@ jobs:
             SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
             SLACK_MESSAGE: ${{ env.REPORT }}
 
-    chitchat-response-generator:
+  chitchat-response-generator:
     runs-on: [self-hosted, linux, x64]
     needs: domain-classifier
     steps:
