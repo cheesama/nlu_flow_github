@@ -87,9 +87,9 @@ with open('domain_dataset.tsv', 'w') as domainData:
     domainData.write('text\tclass\n')
     
     for i, utter in enumerate(utterances):
-        domainData.write(utter.strip())
+        domainData.write(utter.strip().replace('\t',' '))
         domainData.write('\t')
-        domainData.write(labels[i])
+        domainData.write(labels[i].strip().replace('\t', ' '))
         domainData.write('\n')
 
 os.system('rm -rf results')

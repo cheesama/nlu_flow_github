@@ -20,10 +20,13 @@ graph LR
   D[preprocessor] --> DB[spell_corrector]
   
   E[postprocessor] --> EA[rule_entity_filter]
+
+  F[response_geneartion] --> FA[chitchat_response_generator]
  
 ```
 
 ## Reference
-strapi
-KoGPT2
-ludwig
+[strapi](https://strapi.io/)
+[KoGPT2](https://github.com/SKT-AI/KoGPT2)
+[ludwig](https://github.com/uber/ludwig)
+

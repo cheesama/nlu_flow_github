@@ -24,7 +24,7 @@ async def health():
     return output
 
 @app.post("/predict")
-async def predict_faq(text: str, top_k=3):
+async def predict_domain(text: str, top_k=3):
     result = model.predict({'text': [text]})[0]
     result_dict = {}
 
@@ -38,7 +38,7 @@ async def predict_faq(text: str, top_k=3):
 
     result = []
     for  k, v in result_dict.items():
-        result.append({'faq_intent': k, 'confidence': v, 'prompt_id': response_dict[k]})
+        result.append({'domain': k, 'confidence': v})
         if len(result) >= int(top_k):
             break
 
