@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: scenario-classifier
+  name: scenario-classifier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scenario-classifier
+  template:
+    metadata:
+      labels:
+        app: scenario-classifier
+    spec:
+      containers:
+      - image: acrcommbot.azurecr.io/scenario_classifier
+        name: scenario-classifier
+        ports:
+        - containerPort: 8000
+        resources: {}
