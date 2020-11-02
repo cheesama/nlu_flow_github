@@ -94,6 +94,7 @@ jobs:
 
   domain-classifier:
     runs-on: [self-hosted, linux, x64]
+    needs: chitchat-response-generator
     steps:
       - uses: actions/checkout@v2
       - name: model_training
