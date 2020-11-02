@@ -27,6 +27,7 @@ jobs:
         run: |
             sudo chmod 777 /var/run/docker.sock
             sudo chmod 777 -R ~/actions-runner
+            sudo chmod 777 -R /usr/local/
             
   chitchat-response-generator:
     runs-on: [self-hosted, linux, x64]
