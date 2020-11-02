@@ -6,5 +6,6 @@ dill
 
 setuptools>=41.0.0
 numpy==1.18.5
+ludwig[serve,text]
 tensorflow-gpu
-ludwig[full]
+
