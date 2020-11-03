@@ -43,8 +43,16 @@ def validate_api_output(api_result):
     return True
 
 # get data from url(table)
-def get(url: str, max_num=-1):
-    cnt = request_to_server('get', '{}/count'.format(url))
+def get(url: str, filter={}, sort=[], sort_order='ASC', max_num=-1):
+    additional_url = '&'.join([f'{k}={v}' for k, v in filter.items()])
+    if len(sort) > 0:
+        assert sort_order in ['ASC', 'DESC', 'asc', 'desc']
+        additional_url += f"&_sort={','.join(sort)}:{sort_order}"
+
+    if len(additional_url) > 0:
+        additional_url = '?' + additional_url
+
+    cnt = request_to_server('get', f'{url}/count{additional_url}')
     if not validate_api_output(cnt):
         raise ConnectionError("Strapi api failed")
     if cnt == 'Not Found':
