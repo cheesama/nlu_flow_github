@@ -1,5 +1,7 @@
 from nlu_flow.utils import meta_db_client
+
 from tqdm import tqdm
+from datetime import datetime
 
 import dill
 import os, sys
@@ -60,7 +62,7 @@ for data in tqdm(scenario_data, desc=f"collecting table data : nlu-intent-entity
         labels.append("faq")
     elif data["intent_id"]["Intent_ID"] == "intent_OOD":
         utterances.append(data["utterance"])
-        labels.append("out_of_domain")
+        labels.append("out-of-domain")
         total_OOD_utter_num += 1
     else:
         utterances.append(data["utterance"])
@@ -77,13 +79,13 @@ for i, data in tqdm(enumerate(slang_training_data), desc=f"collecting table data
         continue
 
     utterances.append(data["utterance"])
-    labels.append("out_of_domain")
+    labels.append("out-of-domain")
     total_OOD_utter_num += 1
 
 chitchat_data = meta_db_client.get("nlu-chitchat-utterances")
 for data in tqdm(chitchat_data, desc=f"collecting table data : nlu-chitchat-utterances"):
     utterances.append(data["utterance"])
-    labels.append("out_of_domain")
+    labels.append("out-of-domain")
     total_OOD_utter_num += 1
 
 with open('domain_dataset.tsv', 'w') as domainData:
@@ -101,6 +103,8 @@ os.system('ludwig experiment --dataset domain_dataset.tsv --config_file config.y
 #write result to file
 with open('results/experiment_run/test_statistics.json') as f:
     test_result = json.load(f)
+
+    meta_db_client.post('nlu-model-reports', {'name': 'ludwig_domain_classifier', 'version':datetime.today().strftime("%Y-%m-%d_%H:%M:%S"), 'report': test_result})
 
     with open('report.md', 'w') as reportFile:
         reportFile.write('domain classification test result\n')

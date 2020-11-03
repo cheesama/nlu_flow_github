@@ -14,7 +14,7 @@ input_features:
         #'embed': SequenceEmbedEncoder,
         #'passthrough': SequencePassthroughEncoder
         encoder: stacked_cnn
-        #embedding_size: 128
+        embedding_size: 128
 
 output_features:
     -
