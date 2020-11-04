@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: slang-classifier
+  name: slang-classifier
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slang-classifier
+  template:
+    metadata:
+      labels:
+        app: slang-classifier
+    spec:
+      containers:
+      - image: acrcommbot.azurecr.io/slang_classifier
+        name: slang-classifier
+        ports:
+        - containerPort: 8000
+        resources: {}

@@ -1,0 +1,22 @@
+input_features:
+    -
+        name: text
+        type: text
+        level: char
+
+        #encoder type
+        #'stacked_cnn': StackedCNN,
+        #'parallel_cnn': ParallelCNN,
+        #'stacked_parallel_cnn': StackedParallelCNN,
+        #'rnn': StackedRNN,
+        #'cnnrnn': StackedCNNRNN,
+        #'transformer': StackedTransformer,                                                                
+        #'embed': SequenceEmbedEncoder,
+        #'passthrough': SequencePassthroughEncoder
+        encoder: stacked_cnn
+        embedding_size: 128
+
+output_features:
+    -
+        name: class
+        type: category
