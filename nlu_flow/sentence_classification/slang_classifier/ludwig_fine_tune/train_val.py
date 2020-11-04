@@ -7,6 +7,7 @@ import dill
 import os, sys
 import random
 import json
+import pandas as pd
 
 import tensorflow as tf
 tf.debugging.set_log_device_placement(True)
@@ -90,6 +91,10 @@ with open('slang_dataset.tsv', 'w') as slangData:
         slangData.write('\t')
         slangData.write(labels[i].strip().replace('\t', ' '))
         slangData.write('\n')
+
+#handle tsv parsing error
+df = pd.read_csv('slang_dataset.tsv', encoding='utf-8', sep='\t', error_bad_lines=False, engine='python')
+df.to_csv('slang_dataset.tsv', sep = '\t')
 
 os.system('rm -rf results')
 os.system('ludwig experiment --dataset slang_dataset.tsv --config_file config.yml')
