@@ -84,6 +84,8 @@ os.system('ludwig evaluate --dataset scenario_test_dataset.tsv --model_path resu
 with open('results/experiment_run/test_statistics.json') as f:
     test_result = json.load(f)
 
+    meta_db_client.post('nlu-model-reports', {'name': 'ludwig_scenario_classifier', 'version':datetime.today().strftime("%Y-%m-%d_%H:%M:%S"), 'report': test_result})
+
     with open('report.md', 'w') as reportFile:
         reportFile.write('scenario classification test result\n')
         json.dump(test_result['class']['overall_stats'], reportFile, indent=4)
