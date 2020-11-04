@@ -14,6 +14,18 @@ tf.debugging.set_log_device_placement(True)
 utterances = []
 labels = []
 
+## get synonym data for data augmentation(for FAQ data augmentation)
+synonyms = []
+synonym_data = meta_db_client.get("meta-entities")
+for data in tqdm(
+    synonym_data, desc=f"collecting synonym data for data augmentation ..."
+):
+    if type(data) != dict:
+        print(f"check data type : {data}")
+        continue
+
+    synonyms.append([each_synonym.get("synonym") for each_synonym in data.get("meta_synonyms")] + [data.get("Entity_Value")])
+
 ## faq domain
 faq_data = meta_db_client.get("nlu-faq-questions")
 for data in tqdm(faq_data, desc=f"collecting faq data ... "):

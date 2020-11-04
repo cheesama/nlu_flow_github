@@ -86,6 +86,62 @@ jobs:
             SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
             SLACK_MESSAGE: ${{ env.REPORT }}
 
+  scenario-classifier:
+    runs-on: [self-hosted, linux, x64]
+    needs: prepare_self-host_runner
+    steps:
+      - uses: actions/checkout@v2
+      - name: model_training
+        env:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
+        run: |
+            pip3 uninstall -y tensorflow && pip3 install -r requirements.txt && pip3 install -r requirements_model.txt
+            python3 setup.py install
+            cd nlu_flow/sentence_classification/scenario_classifier/ludwig_fine_tune && pip3 install -r requirements.txt && python3 train_val.py && cp -r * ../../../../
+            
+      # Connect to Azure Container registry (ACR)
+      - uses: azure/docker-login@v1
+        with:
+            login-server: ${{ secrets.REGISTRY_NAME }}.azurecr.io
+            username: ${{ secrets.REGISTRY_USERNAME }}
+            password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # Container build and push to a Azure Container registry (ACR)
+      - name: dockerize image to ACR
+        env:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
+        run: |
+            ls -al
+            docker build . -t ${{ secrets.REGISTRY_NAME }}.azurecr.io/scenario_classifier:${{ github.sha }} --build-arg META_ENDPOINT
+            docker push ${{ secrets.REGISTRY_NAME }}.azurecr.io/scenario_classifier:${{ github.sha }}
+
+      - uses: azure/k8s-set-context@v1
+        with:
+            method: kubeconfig
+            kubeconfig: ${{ secrets.KUBECONFIG }}
+        id: setcontext
+
+      - uses: Azure/k8s-deploy@v1
+        with:
+            namespace: ${{ secrets.NAMESPACE }}
+            manifests: |
+                manifests/deployment.yaml
+                manifests/service.yaml
+            images: ${{ secrets.REGISTRY_NAME }}.azurecr.io/scenario_classifier:${{ github.sha }}
+            kubectl-version: 'latest'
+
+      - name: set report as env
+        run: |
+            echo ::set-env name=REPORT::$(cat report.md)
+
+      - name: Slack notification
+        uses: rtCamp/action-slack-notify@master
+        env:
+            SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+            SLACK_MESSAGE: ${{ env.REPORT }}
+
   slang-classifier:
     runs-on: [self-hosted, linux, x64]
     needs: prepare_self-host_runner
@@ -198,7 +254,7 @@ jobs:
             SLACK_MESSAGE: chitchat-response-generator training & deploy done
     
   shutdown_self-host_runner:
-    needs: [chitchat-response-generator, domain-classifier, slang-classifier]
+    needs: [chitchat-response-generator, domain-classifier, slang-classifier, scenario-classifier]
     runs-on: ubuntu-latest
     steps:
       - name: Azure Login

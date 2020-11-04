@@ -38,12 +38,13 @@ for scenario_table in scenario_table_list:
             continue
 
         try:
-            utterances.append(data["utterance"]))
-            labels.append(data['intent_id']['Intent_ID'])
+            if data['data_type'] == 'training':
+                utterances.append(data["utterance"]))
+                labels.append(data['intent_id']['Intent_ID'])
 
-            #synonym augmentation
-            if len(data['entities']) == 1:
-                pass
+                #synonym augmentation
+                if len(data['entities']) == 1:
+                    pass    
 
         except:
             print (f'check data: {data}')
