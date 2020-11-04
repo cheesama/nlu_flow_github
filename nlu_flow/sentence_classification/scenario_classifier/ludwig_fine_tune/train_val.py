@@ -48,8 +48,11 @@ for scenario_table in scenario_table_list:
                 test_labels.append(data['intent_id']['Intent_ID'])
 
             #synonym augmentation
-            if len(data['entities']) == 1:
-                pass    
+            if 'entities' not in data.keys() or data['entities'] is None:
+                continue
+
+            if len(data['entities']) > 1:
+                continue
         else:
             utterances.append(data["utterance"])
             labels.append(data['intent_id']['Intent_ID'])
@@ -75,7 +78,7 @@ with open('scenario_test_dataset.tsv', 'w') as scenarioData:
 
 os.system('rm -rf results')
 os.system('ludwig experiment --dataset scenario_dataset.tsv --config_file config.yml')
-os.system('ludwig predict --dataset scenario_test_dataset.tsv --model_path results/experiment_run/model')
+os.system('ludwig evaluate --dataset scenario_test_dataset.tsv --model_path results/experiment_run/model')
 
 #write result to file
 with open('results/experiment_run/test_statistics.json') as f:
