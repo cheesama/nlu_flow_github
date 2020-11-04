@@ -38,21 +38,22 @@ for scenario_table in scenario_table_list:
         if type(data) != dict:
             print(f"check data type : {data}")
             continue
-
-        try:
+        
+        if 'data_type' in data.keys():
             if data['data_type'] == 'training':
-                utterances.append(data["utterance"]))
+                utterances.append(data["utterance"])
                 labels.append(data['intent_id']['Intent_ID'])
-            elif data['data_type'] == 'golden_set':
-                test_utterances.append(data["utterance"]))
+            elif data['data_type'] == 'goldenset':
+                test_utterances.append(data["utterance"])
                 test_labels.append(data['intent_id']['Intent_ID'])
 
-                #synonym augmentation
-                if len(data['entities']) == 1:
-                    pass    
+            #synonym augmentation
+            if len(data['entities']) == 1:
+                pass    
+        else:
+            utterances.append(data["utterance"]))
+            labels.append(data['intent_id']['Intent_ID'])
 
-        except:
-            print (f'check data: {data}')
 
 with open('scenario_dataset.tsv', 'w') as scenarioData:
     scenarioData.write('text\tclass\n')
