@@ -51,7 +51,7 @@ for scenario_table in scenario_table_list:
             if len(data['entities']) == 1:
                 pass    
         else:
-            utterances.append(data["utterance"]))
+            utterances.append(data["utterance"])
             labels.append(data['intent_id']['Intent_ID'])
 
 
