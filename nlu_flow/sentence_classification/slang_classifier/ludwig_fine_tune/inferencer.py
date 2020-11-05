@@ -38,7 +38,7 @@ async def predict_slang(text: str, top_k=3):
 
     result = []
     for  k, v in result_dict.items():
-        result.append({'domain': k, 'confidence': v})
+        result.append({'is_slang': k, 'confidence': v})
         if len(result) >= int(top_k):
             break
 

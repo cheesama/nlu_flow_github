@@ -32,13 +32,13 @@ async def predict_scenario(text: str, top_k=3):
         if 'class_probabilities_' not in column or 'UNK' in column:
             continue
 
-        result_dict[column[column.rfind('_') + 1:]] = result[column][0]
+        result_dict[column.split('probabilities_')[1]] = result[column][0]
 
     result_dict = {k: v for k, v in sorted(result_dict.items(), key=lambda item: item[1], reverse=True)}
 
     result = []
     for  k, v in result_dict.items():
-        result.append({'domain': k, 'confidence': v})
+        result.append({'intent': k, 'confidence': v})
         if len(result) >= int(top_k):
             break
 
