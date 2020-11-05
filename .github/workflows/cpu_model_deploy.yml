@@ -294,6 +294,7 @@ jobs:
                 manifests/service.yaml
             images: ${{ secrets.REGISTRY_NAME }}.azurecr.io/faq_classifier:${{ github.sha }}
             kubectl-version: 'latest'
+            strategy: blue-green
 
       - name: set report as env
         run: |
