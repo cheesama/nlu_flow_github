@@ -62,8 +62,14 @@ def get(url: str, filter={}, sort=[], sort_order='ASC', max_num=-1):
     start, iter_num = 0, 50
     len_ = 0
     pbar = tqdm(total=cnt, position=0, leave=True, desc=f'Downloading data : {url} ...')
+    url += additional_url
+
     while len_ < int(cnt):
-        tmp_ids = request_to_server('get', url='{}?_start={}&_limit={}'.format(url, start, iter_num))
+        if len(additional_url) > 0:
+            tmp_ids = request_to_server('get', url='{}&_start={}&_limit={}'.format(url, start, iter_num))
+        else:
+            tmp_ids = request_to_server('get', url='{}?_start={}&_limit={}'.format(url, start, iter_num))
+
         res.extend(tmp_ids)
         start += iter_num
         len_ += len(tmp_ids)
