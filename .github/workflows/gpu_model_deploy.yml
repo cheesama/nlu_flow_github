@@ -75,6 +75,8 @@ jobs:
                 manifests/service.yaml
             images: ${{ secrets.REGISTRY_NAME }}.azurecr.io/domain_classifier:${{ github.sha }}
             kubectl-version: 'latest'
+            strategy: canary
+            percentage: 50
 
       - name: set report as env
         run: |
