@@ -30,4 +30,5 @@ sudo apt install -y docker-ce
 sudo chmod 777 /usr/local/bin
 #sudo chmod 777 /var/run/docker.sock
 sudo chmod 777 -R /var/run/
+sudo chmod 777 -R /usr/lib/python3/
 sudo chmod 777 -R /usr/local/lib/python3.6/dist-packages/
