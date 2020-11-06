@@ -23,9 +23,10 @@ jobs:
     runs-on: [self-hosted, linux, x64, scaleset]
     needs: turn_on_self-host_runner
     steps:
-      - name: GPU machine turn on
+      - uses: actions/checkout@v2
+      - name: setting gpu host
         run: |
-            sh external/gpu-host-setting.sh
+            sudo sh external/gpu-host-setting.sh
             sudo chmod 777 /var/run/docker.sock
             sudo chmod 777 -R ~/actions-runner
             sudo chmod 777 -R /usr/local/
@@ -35,7 +36,6 @@ jobs:
     runs-on: [self-hosted, linux, x64, scaleset]
     needs: prepare_self-host_runner
     steps:
-      - uses: actions/checkout@v2
       - name: model_training
         env:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
