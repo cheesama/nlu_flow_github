@@ -31,8 +31,7 @@ jobs:
             sudo chmod 777 /var/run/docker.sock
             sudo chmod 777 -R ~/actions-runner
             sudo chmod 777 -R /usr/local/
-            docker rmi -f $(docker images -a -q)
-
+            
   domain-classifier:
     runs-on: [self-hosted, linux, x64, scaleset]
     needs: prepare_self-host_runner
@@ -270,6 +269,7 @@ jobs:
 
       - name: GPU machine turn off
         run: |
+            docker rmi -f $(docker images -a -q)
             az vm deallocate -g ${{ secrets.RESOURCE_GROUP_NAME }} -n ${{ secrets.GPU_VM_NAME }}
 
       - name: Slack notification
