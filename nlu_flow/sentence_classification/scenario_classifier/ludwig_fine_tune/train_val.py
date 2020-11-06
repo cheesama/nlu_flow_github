@@ -112,5 +112,5 @@ with open("results/experiment_run/test_statistics.json") as f:
     )
 
     with open("report.md", "w") as reportFile:
-        reportFile.write("scenario classifier(transformer based) test result\n")
+        reportFile.write("scenario classifier(char - stacked_parallel_cnn based) test result\n")
         json.dump(test_result["class"]["overall_stats"], reportFile, indent=4)

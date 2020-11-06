@@ -107,5 +107,5 @@ with open('results/experiment_run/test_statistics.json') as f:
     meta_db_client.post('nlu-model-reports', {'name': 'ludwig_domain_classifier', 'version':datetime.today().strftime("%Y-%m-%d_%H:%M:%S"), 'report': test_result})
 
     with open('report.md', 'w') as reportFile:
-        reportFile.write('domain classification test result\n')
+        reportFile.write('domain classification (char - stacked_parallel_cnn based) test result\n')
         json.dump(test_result['class']['overall_stats'], reportFile, indent=4)
