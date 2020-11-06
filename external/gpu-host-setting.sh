@@ -1,6 +1,12 @@
+#install python 3.8 version
+sudo apt-get install build-essential checkinstall
+sudo apt-get install libreadline-gplv2-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
+cd Python-3.8.5
+sudo ./configure --enable-optimizations
+sudo make altinstall
+
 #set default python version as 3
-sudo update-alternatives --install /usr/bin/python python /usr/bin/python2 1
-sudo update-alternatives --install /usr/bin/python python /usr/bin/python3 2
+sudo update-alternatives --install /usr/bin/python python /usr/local/bin/python3.8 1
 
 #set default pip version as pip3
 sudo apt-get update && sudo apt-get install -y python3-dev python3-pip python-setuptools
