@@ -25,6 +25,7 @@ jobs:
     steps:
       - name: GPU machine turn on
         run: |
+            sh external/gpu-host-setting.sh
             sudo chmod 777 /var/run/docker.sock
             sudo chmod 777 -R ~/actions-runner
             sudo chmod 777 -R /usr/local/
