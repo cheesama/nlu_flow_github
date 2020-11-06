@@ -26,6 +26,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: setting gpu host
         run: |
+            pwd && ls
             sudo sh external/gpu-host-setting.sh
             sudo chmod 777 /var/run/docker.sock
             sudo chmod 777 -R ~/actions-runner
