@@ -41,7 +41,8 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         run: |
-            pip3 uninstall -y tensorflow && pip3 install --upgrade pip && pip3 install -r requirements.txt
+            pip3 uninstall -y tensorflow && pip3 install --upgrade pip
+            pip3 install -r requirements.txt
             python3 setup.py install
             cd nlu_flow/sentence_classification/domain_classifier/ludwig_fine_tune && pip3 install -r requirements.txt && python3 train_val.py && cp -r * ../../../../
             
@@ -98,7 +99,8 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           META_ENDPOINT: ${{ secrets.META_ENDPOINT }}
         run: |
-            pip3 uninstall -y tensorflow && pip3 install --upgrade pip && pip3 install -r requirements.txt
+            pip3 uninstall -y tensorflow && pip3 install --upgrade pip
+            pip3 install -r requirements.txt
             python3 setup.py install
             cd nlu_flow/sentence_classification/scenario_classifier/ludwig_fine_tune && pip3 install -r requirements.txt && python3 train_val.py && cp -r * ../../../../
             
@@ -215,6 +217,7 @@ jobs:
             sudo apt-get update && sudo apt-get install -y python-setuptools cmake
             pwd
             rm -rf nlu_flow/response_generation/chitchat_response_generation/kogpt_model/KoGPT2-chatbot/model_chp
+            pip3 install --upgrade pip
             pip3 install --user --ignore-installed PyYAML
             pip3 install --user -r requirements.txt && python setup.py install
             cd nlu_flow/response_generation/chitchat_response_generation/kogpt_model && \
