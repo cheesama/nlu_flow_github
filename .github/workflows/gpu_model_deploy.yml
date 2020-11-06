@@ -75,8 +75,7 @@ jobs:
                 manifests/service.yaml
             images: ${{ secrets.REGISTRY_NAME }}.azurecr.io/domain_classifier:${{ github.sha }}
             kubectl-version: 'latest'
-            strategy: canary
-            percentage: 50
+            strategy: blue-green
 
       - name: set report as env
         run: |
@@ -133,6 +132,7 @@ jobs:
                 manifests/service.yaml
             images: ${{ secrets.REGISTRY_NAME }}.azurecr.io/scenario_classifier:${{ github.sha }}
             kubectl-version: 'latest'
+            strategy: blue-green
 
       - name: set report as env
         run: |
@@ -189,6 +189,7 @@ jobs:
                 manifests/service.yaml
             images: ${{ secrets.REGISTRY_NAME }}.azurecr.io/slang_classifier:${{ github.sha }}
             kubectl-version: 'latest'
+            strategy: blue-green
 
       - name: set report as env
         run: |
@@ -248,6 +249,7 @@ jobs:
                 manifests/service.yaml
             images: ${{ secrets.REGISTRY_NAME }}.azurecr.io/chitchat-response-generator:${{ github.sha }}
             kubectl-version: 'latest'
+            strategy: blue-green
 
       - name: Slack notification
         uses: rtCamp/action-slack-notify@master
