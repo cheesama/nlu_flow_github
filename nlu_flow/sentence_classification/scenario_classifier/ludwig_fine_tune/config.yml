@@ -13,8 +13,8 @@ input_features:
         #'transformer': StackedTransformer,                                                                
         #'embed': SequenceEmbedEncoder,
         #'passthrough': SequencePassthroughEncoder
-        encoder: stacked_cnn
-        embedding_size: 128
+        encoder: embed
+        #embedding_size: 128
 
 output_features:
     -
