@@ -3,6 +3,7 @@ input_features:
         name: text
         type: text
         level: char
+        embedding_size: 72
 
         #encoder type
         #'stacked_cnn': StackedCNN,
@@ -13,8 +14,7 @@ input_features:
         #'transformer': StackedTransformer,                                                                
         #'embed': SequenceEmbedEncoder,
         #'passthrough': SequencePassthroughEncoder
-        encoder: embed
-        #embedding_size: 128
+        encoder: transformer
 
 output_features:
     -
