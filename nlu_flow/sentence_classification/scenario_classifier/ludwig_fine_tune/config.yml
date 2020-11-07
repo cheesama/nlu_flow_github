@@ -2,7 +2,7 @@ input_features:
     -
         name: text
         type: text
-        level: char
+        level: word
         #embedding_size: 72
 
         #encoder type
